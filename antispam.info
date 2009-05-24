@@ -1,0 +1,5 @@
+name = AntiSpam
+description = Use the anti-spam service to protect your site from spam
+package = "Spam control"
+core = 6.x
+
