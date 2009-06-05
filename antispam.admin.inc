@@ -49,8 +49,13 @@ function _antispam_settings_form() {
       $deapikey_div_style = 'visibility: visible; overflow: hidden;';
       break;
   }
-  $is_valid = (antispam_api_cmd_verify_key($apikey) 
+  if (empty($apikey)) {
+    $is_valid = TRUE;
+  }
+  else {
+    $is_valid = (antispam_api_cmd_verify_key($apikey) 
                  == ANTISPAM_API_RESULT_SUCCESS ? TRUE : FALSE);
+  }
   $service_fieldset_collapsed = FALSE; // always show 
 
   $form['service'] = array(
@@ -438,7 +443,7 @@ function antispam_generate_statistics_graph() {
             . '&chs=' . $chart_width . 'x' . ($chart_width / 2) // chart size
             . '&chds=0,' . $total
             . '&chl=' . t('Spam') . '|' . t('Ham') .'|'
-              . t('False Nagative') . '|' . t('False Positive') // legend
+              . t('False Negative') . '|' . t('False Positive') // legend
             . '&chd=t:' . $counts['total_spam'] . ',' . $counts['total_ham'] . ','
               . $counts['total_fnegative'] . ',' . $counts['total_fpositive']
             . '&chco=dd6666,ffdd33,444444,bbbbbb' // line colors

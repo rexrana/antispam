@@ -7,7 +7,7 @@ INSTALLATION:
 2. Copy all modules files, keeping directory structure, to the
    folder 'modules/antispam'
 
-3. Enable the akismet module in 'admin/modules'
+3. Enable the antispam module in 'admin/modules'
 
 4. Visit 'admin/settings/antispam' and enter your API key for the
    selected antispam service provider.
