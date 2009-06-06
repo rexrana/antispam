@@ -185,7 +185,7 @@ function _antispam_settings_form() {
   $form['node_options']['antispam_check_nodetypes'] = array(
     '#type' => 'checkboxes', '#title' => t('Check for spam in these node types'),
     '#options' => node_get_types('names'),
-    '#default_value' => variable_get('antispam_check_nodetypes', NULL),
+    '#default_value' => variable_get('antispam_check_nodetypes', array()),
     '#description' => t('Use this option to <em>enable</em> or <em>disable</em> spam check for nodes of types specified here. When this option is enabled, a request will be sent to the selected antispam service, in real time. If the service was down, nodes would simply be queued for manual moderation. Users with <a href="!admin-access">@admin-nodes</a> permission and <a href="!admin-access">spam moderators</a> are exempt from this check.',
       array(
         '@admin-nodes' => t('administer nodes'),
@@ -312,7 +312,7 @@ function _antispam_settings_form() {
   $form['anti_spambot']['antispam_antispambot_rules'] = array(
     '#type' => 'checkboxes', '#title' => t('Identify spambots by'),
     '#options' => $anti_spambot_rules,
-    '#default_value' => variable_get('antispam_antispambot_rules', NULL),
+    '#default_value' => variable_get('antispam_antispambot_rules', array()),
     '#description' => t('These rules will be applied before sending any request to the antispam service. If a request to send content matches any of these rules, the actions defined below will be triggered. Requests to send content are checked against spam that is stored locally (visible from the <a href="!moderation-queue">moderation queue</a>).',
       array(
         '!moderation-queue' => url('admin/content/antispam'),
