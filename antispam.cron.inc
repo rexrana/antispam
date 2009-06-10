@@ -5,12 +5,6 @@
  * Shutdown function executed at cron time.
  */
 function antispam_cron_shutdown() {
-  /**
-   * NOTE: We have to include 'comment.admin.inc' to use _comment_delete_thread() 
-   *       and _comment_update_node_statistics(). 
-   *       These functions are called at the antispam_content_delete() function.
-   */
-  require_once $_SERVER['DOCUMENT_ROOT'] . base_path() . drupal_get_path('module', 'comment') . '/comment.admin.inc';
 
   watchdog('cron', 'AntiSpam cron started at %time.', array('%time' => format_date(time(), 'custom', 'H:i:s')));
 

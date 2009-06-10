@@ -193,7 +193,8 @@ function antispam_perm() {
  */
 function antispam_cron() {
   module_load_include('inc', 'antispam', 'antispam.cron');
-  register_shutdown_function('antispam_cron_shutdown');
+  module_load_include('inc', 'comment', 'comment.admin'); 
+  antispam_cron_shutdown();
 }
 
 /**
