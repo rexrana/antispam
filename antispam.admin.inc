@@ -768,7 +768,7 @@ function antispam_moderation_form(&$form_state, $mode = '', $submode = '', $sql 
           'attributes' => array(
             'title' => truncate_utf8($content->comment, BODY_TOOLTIP_LEN)
           ), 
-          'fragment' => 'comment-' . $comment->cid,
+          'fragment' => 'comment-' . $content->cid,
          )) .' '. theme('mark', node_mark($content->nid, $content->timestamp)));
       $form['author'][$content->cid] = array('#value' => theme('username', $content));
       $form['status'][$content->cid] = array('#value' => ($content->status == COMMENT_PUBLISHED ? t('published') : t('not published')));
