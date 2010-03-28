@@ -39,13 +39,6 @@ define('ANTISPAM_COUNT_FALSE_NEGATIVE', 3);
 define('ANTISPAM_COUNT_FALSE_POSITIVE', 4);
 
 /**
- * Implementation of hook_init().
- */
-function antispam_init() {
-  drupal_add_js(drupal_get_path('module', 'antispam') . '/antispam.js');
-}
-
-/**
  * Implementation of hook_help().
  */
 function antispam_help($path, $arg) {
@@ -452,127 +445,120 @@ function antispam_menu() {
     'file' => 'antispam.admin.inc',
   );
 
-  $moderator_types = antispam_get_moderator_types();
-  if (_antispam_is_moderator($moderator_types)) {
-    $items['admin/content/antispam'] = array(
-      'title' => t('AntiSpam moderation queue'),
-      'description' => t('Manage the AntiSpam spam queue, appropving or deleting content in need of moderation.'),
-      'page callback' => 'antispam_callback_queue',
-      'access callback' => '_antispam_is_moderator',
-      'access arguments' => array($moderator_types),
-      'file' => 'antispam.admin.inc',
-   );
-    $items['admin/content/antispam/overview'] = array(
-      'title' => t('Overview'),
-      'type' => MENU_DEFAULT_LOCAL_TASK,
-      'weight' => 0,
-      'file' => 'antispam.admin.inc',
-    );
-    if (_antispam_is_node_moderator($moderator_types)) {
-      $items['admin/content/antispam/nodes'] = array(
-        'title' => t('Nodes'),
-        'page callback' => 'antispam_callback_queue',
-        'page arguments' => array('nodes'),
-        'access callback' => '_antispam_is_node_moderator',
-        'access arguments' => array($moderator_types),
-        'type' => MENU_LOCAL_TASK,
-        'weight' => 1,
-        'file' => 'antispam.admin.inc',
-      );
-      $items['admin/content/antispam/nodes/spam'] = array(
-        'title' => t('Spam'),
-        'page callback' => 'antispam_callback_queue',
-        'page arguments' => array('nodes'),
-        'access callback' => '_antispam_is_node_moderator',
-        'access arguments' => array($moderator_types),
-        'type' => MENU_DEFAULT_LOCAL_TASK,
-        'weight' => 0,
-        'file' => 'antispam.admin.inc',
-      );
-      $items['admin/content/antispam/nodes/unpublished'] = array(
-        'title' => t('Unpublished nodes'),
-        'page callback' => 'antispam_callback_queue',
-        'page arguments' => array('nodes', 'unpublished'),
-        'access callback' => '_antispam_is_node_moderator',
-        'access arguments' => array($moderator_types),
-        'type' => MENU_LOCAL_TASK,
-        'weight' => 1,
-        'file' => 'antispam.admin.inc',
-      );
-      $items['admin/content/antispam/nodes/published'] = array(
-        'title' => t('Published nodes'),
-        'page callback' => 'antispam_callback_queue',
-        'page arguments' => array('nodes', 'published'),
-        'access callback' => '_antispam_is_node_moderator',
-        'access arguments' => array($moderator_types),
-        'type' => MENU_LOCAL_TASK,
-        'weight' => 2,
-        'file' => 'antispam.admin.inc',
-      );
-    }
-    if (_antispam_is_moderator($moderator_types, 'comments')) {
-      $items['admin/content/antispam/comments'] = array(
-        'title' => t('Comments'),
-        'page callback' => 'antispam_callback_queue',
-        'page arguments' => array('comments'),
-        'access callback' => '_antispam_is_moderator',
-        'access arguments' => array($moderator_types, 'comments'),
-        'type' => MENU_LOCAL_TASK,
-        'weight' => 2,
-        'file' => 'antispam.admin.inc',
-      );
-      $items['admin/content/antispam/comments/spam'] = array(
-        'title' => t('Spam'),
-        'page callback' => 'antispam_callback_queue',
-        'page arguments' => array('comments'),
-        'access callback' => '_antispam_is_moderator',
-        'access arguments' => array($moderator_types, 'comments'),
-        'type' => MENU_DEFAULT_LOCAL_TASK,
-        'weight' => 0,
-        'file' => 'antispam.admin.inc',
-      );
-      $items['admin/content/antispam/comments/unpublished'] = array(
-        'title' => t('Unpublished comments'),
-        'page callback' => 'antispam_callback_queue',
-        'page arguments' => array('comments', 'unpublished'),
-        'access callback' => '_antispam_is_moderator',
-        'access arguments' => array($moderator_types, 'comments'),
-        'type' => MENU_LOCAL_TASK,
-        'weight' => 1,
-        'file' => 'antispam.admin.inc',
-      );
-      $items['admin/content/antispam/comments/published'] = array(
-        'title' => t('Published comments'),
-        'page callback' => 'antispam_callback_queue',
-        'page arguments' => array('comments', 'published'),
-        'access callback' => '_antispam_is_moderator',
-        'access arguments' => array($moderator_types, 'comments'),
-        'type' => MENU_LOCAL_TASK,
-        'weight' => 2,
-        'file' => 'antispam.admin.inc',
-      );
-    }
-    $items['admin/content/antispam/statistics'] = array(
-      'title' => t('Statistics'),
-      'page callback' => 'antispam_callback_queue',
-      'page arguments' => array('statistics'),
-      'access callback' => '_antispam_is_moderator',
-      'access arguments' => array($moderator_types),
-      'type' => MENU_LOCAL_TASK,
-      'weight' => 3,
-      'file' => 'antispam.admin.inc',
-    );
-    $item = array(
-      'title' => 'switch content status',
-      'page callback' => 'antispam_page',
-      'page arguments' => array(0, 1, 2, 3),
-      'load arguments' => array('%map', '%index'),
-      'access callback' => 'antispam_access_callback',
-      'access arguments' => array(0, 1, 2, 3),
-    );
-    foreach (array('publish', 'unpublish', 'submit-spam', 'submit-ham') as $op) {
-      $items['antispam/%antispam/%/'. $op] = $item;
-    }
+  $items['admin/content/antispam'] = array(
+    'title' => t('AntiSpam moderation queue'),
+    'description' => t('Manage the AntiSpam spam queue, appropving or deleting content in need of moderation.'),
+    'page callback' => 'antispam_callback_queue',
+    'access callback' => '_antispam_is_moderator',
+    'access arguments' => array($moderator_types),
+    'file' => 'antispam.admin.inc',
+  );
+  $items['admin/content/antispam/overview'] = array(
+    'title' => t('Overview'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 0,
+    'file' => 'antispam.admin.inc',
+  );
+  $items['admin/content/antispam/nodes'] = array(
+    'title' => t('Nodes'),
+    'page callback' => 'antispam_callback_queue',
+    'page arguments' => array('nodes'),
+    'access callback' => '_antispam_is_node_moderator',
+    'access arguments' => array($moderator_types),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 1,
+    'file' => 'antispam.admin.inc',
+  );
+  $items['admin/content/antispam/nodes/spam'] = array(
+    'title' => t('Spam'),
+    'page callback' => 'antispam_callback_queue',
+    'page arguments' => array('nodes'),
+    'access callback' => '_antispam_is_node_moderator',
+    'access arguments' => array($moderator_types),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 0,
+    'file' => 'antispam.admin.inc',
+  );
+  $items['admin/content/antispam/nodes/unpublished'] = array(
+    'title' => t('Unpublished nodes'),
+    'page callback' => 'antispam_callback_queue',
+    'page arguments' => array('nodes', 'unpublished'),
+    'access callback' => '_antispam_is_node_moderator',
+    'access arguments' => array($moderator_types),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 1,
+    'file' => 'antispam.admin.inc',
+  );
+  $items['admin/content/antispam/nodes/published'] = array(
+    'title' => t('Published nodes'),
+    'page callback' => 'antispam_callback_queue',
+    'page arguments' => array('nodes', 'published'),
+    'access callback' => '_antispam_is_node_moderator',
+    'access arguments' => array($moderator_types),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
+    'file' => 'antispam.admin.inc',
+  );
+  $items['admin/content/antispam/comments'] = array(
+    'title' => t('Comments'),
+    'page callback' => 'antispam_callback_queue',
+    'page arguments' => array('comments'),
+    'access callback' => '_antispam_is_moderator',
+    'access arguments' => array($moderator_types, 'comments'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
+    'file' => 'antispam.admin.inc',
+  );
+  $items['admin/content/antispam/comments/spam'] = array(
+    'title' => t('Spam'),
+    'page callback' => 'antispam_callback_queue',
+    'page arguments' => array('comments'),
+    'access callback' => '_antispam_is_moderator',
+    'access arguments' => array($moderator_types, 'comments'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 0,
+    'file' => 'antispam.admin.inc',
+  );
+  $items['admin/content/antispam/comments/unpublished'] = array(
+    'title' => t('Unpublished comments'),
+    'page callback' => 'antispam_callback_queue',
+    'page arguments' => array('comments', 'unpublished'),
+    'access callback' => '_antispam_is_moderator',
+    'access arguments' => array($moderator_types, 'comments'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 1,
+    'file' => 'antispam.admin.inc',
+  );
+  $items['admin/content/antispam/comments/published'] = array(
+    'title' => t('Published comments'),
+    'page callback' => 'antispam_callback_queue',
+    'page arguments' => array('comments', 'published'),
+    'access callback' => '_antispam_is_moderator',
+    'access arguments' => array($moderator_types, 'comments'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
+    'file' => 'antispam.admin.inc',
+  );
+  $items['admin/content/antispam/statistics'] = array(
+    'title' => t('Statistics'),
+    'page callback' => 'antispam_callback_queue',
+    'page arguments' => array('statistics'),
+    'access callback' => '_antispam_is_moderator',
+    'access arguments' => array($moderator_types),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 3,
+    'file' => 'antispam.admin.inc',
+  );
+  $item = array(
+    'title' => 'switch content status',
+    'page callback' => 'antispam_page',
+    'page arguments' => array(0, 1, 2, 3),
+    'load arguments' => array('%map', '%index'),
+    'access callback' => 'antispam_access_callback',
+    'access arguments' => array(0, 1, 2, 3),
+  );
+  foreach (array('publish', 'unpublish', 'submit-spam', 'submit-ham') as $op) {
+    $items['antispam/%antispam/%/'. $op] = $item;
   }
   return $items;
 }
@@ -1007,6 +993,15 @@ function _antispam_comment_form_submit($form, &$form_state, $original_submit_cal
       $cid = $match[1];
       $goto[2] = NULL;
     }
+  }
+
+  //---- #658990 ----
+  // Quit asap, if current user has administration permission
+  // or permission to post without spam checking.
+  if (antispam_is_spam_moderator('comments') || user_access('post with no antispam checking')) {
+    antispam_notify_moderators('comment', $comment, ($comment->status == COMMENT_PUBLISHED ? TRUE : FALSE), FALSE);
+    // Return NULL or the destination returned by the original #submit callback.
+    return $goto;
   }
 
   // Once we have a $cid, we can (try to) load the comment with all relevant
@@ -1878,8 +1873,8 @@ function antispam_content_publish_operation($content_type, $content, $op, $log_a
 /**
  * Prepare comment data for AntiSpam requests.
  *
- * @param $content_type: string 'node' or 'comment'
- * @param $content: object $node or $comment
+ * @param $content_type: string 'node' or 'comment' or 'other'
+ * @param $content: object $node or $comment or $other
  * @param $provider: integer AKISMET_SERVIE/TYPEPAD_SERVICE/DEFENSIO_SERVICE
  * @return array
  */
@@ -1917,7 +1912,7 @@ function antispam_prepare_comment_data($content_type, $content, $provider) {
         $comment_data['article-date'] = date("Y/m/d", $node_created);
         $comment_data['comment-type'] = 'comment';
       }
-      else { // node
+      else if ($content_type == 'node') {
         $comment_data['permalink'] = url('node/'. $content->nid);
         $comment_data['comment-author_email'] = (isset($user->mail) ? $user->mail : '');
         $comment_data['comment-author_url'] = '';
@@ -1925,6 +1920,15 @@ function antispam_prepare_comment_data($content_type, $content, $provider) {
         $comment_data['article-date'] = date("Y/m/d");  // now
         $comment_data['comment-type'] = 'other';
       }
+      else { // other
+        $comment_data['permalink'] = '';
+        $comment_data['comment-author_email'] = (isset($user->mail) ? $user->mail : isset($content->mail)? $content->mail : '');
+        $comment_data['comment-author_url'] = (isset($content->homepage) ? $content->homepage : '');
+        $comment_data['comment-content'] = $content->body;
+        $comment_data['article-date'] = date("Y/m/d");  // now
+        $comment_data['comment-type'] = 'other';
+      }
+
       if ($user->uid > 0) {
         $comment_data['user-logged-in'] = TRUE;  // not anonymous
       }
@@ -1932,7 +1936,7 @@ function antispam_prepare_comment_data($content_type, $content, $provider) {
          $comment_data['trusted-user'] = TRUE;
       }
       // 'comment-author' must not be a null string
-      if ($user->uid == 0) {
+      if ($user->uid == 0 || empty($comment_data['comment-author'])) {
         $comment_data['comment-author'] = variable_get('anonymous', t('Anonymous'));
       }
     }
@@ -1952,17 +1956,23 @@ function antispam_prepare_comment_data($content_type, $content, $provider) {
       'comment_author' => $content->name,
     );
     if ($content_type == 'comment') {
-       $comment_data['permalink'] = url('node/'. $content->nid, array('fragment' => 'comment-'. $content->cid));
-       $comment_data['comment_author_email'] = $content->mail;
-       $comment_data['comment_author_url'] = $content->homepage;
-       $comment_data['comment_content'] = $content->comment;
-     }
-     else {
-       $comment_data['permalink'] = url('node/'. $content->nid);
-       $comment_data['comment_author_email'] = (isset($user->mail) ? $user->mail : '');
-       $comment_data['comment_author_url'] = '';
-       $comment_data['comment_content'] = $content->body;
-     }
+      $comment_data['permalink'] = url('node/'. $content->nid, array('fragment' => 'comment-'. $content->cid));
+      $comment_data['comment_author_email'] = $content->mail;
+      $comment_data['comment_author_url'] = $content->homepage;
+      $comment_data['comment_content'] = $content->comment;
+    }
+    else if ($content_type == 'node') {
+      $comment_data['permalink'] = url('node/'. $content->nid);
+      $comment_data['comment_author_email'] = (isset($user->mail) ? $user->mail : '');
+      $comment_data['comment_author_url'] = '';
+      $comment_data['comment_content'] = $content->body;
+    }
+    else { // other
+      $comment_data['permalink'] = '';
+      $comment_data['comment-author_email'] = (isset($user->mail) ? $user->mail : isset($content->mail)? $content->mail : '');
+      $comment_data['comment-author_url'] = (isset($content->homepage) ? $content->homepage : '');
+      $comment_data['comment_content'] = $content->body;
+    }
   }
   return $comment_data;
 }
@@ -2027,9 +2037,41 @@ function antispam_api_cmd_verify_key($key) {
 
 
 /**
+ * AntiSpam API: Generic Data Check 
+ *
+ * return: -1  Error
+ *          0  Ham
+ *          1  Spam
+ */
+function antispam_api_cmd_spam_check($body, $name = NULL, $mail = NULL, $homepage = NULL) {
+  $provider = antispam_get_service_provider();
+  $api_host = antispam_get_api_host($provider);
+  $api_key = antispam_get_api_key($provider);
+  if (empty($api_key)) {
+    return array(ANTISPAM_API_RESULT_ERROR);
+  }
+  $content = array(
+    'body' => $body,
+    'name' => $name,
+    'mail' => $mail,
+    'homepage' => $homepage,
+  );
+  $api_result = antispam_api_cmd_comment_check('other', $content);
+  if ($api_result[0] == ANTISPAM_API_RESULT_IS_HAM) {
+    return 0; // Ham
+  }
+  else if ($api_result[0] == ANTISPAM_API_RESULT_IS_SPAM) {
+    return 1; // Spam
+  }
+  else {
+    return -1; // Error
+  }
+}
+
+/**
  * AntiSpam API: Comment Check 
  *
- * @param $content_type: string 'node' or 'comment'
+ * @param $content_type: string 'node' or 'comment' or 'other'
  * @param $content: object $node or $comment
  *
  * @return array 

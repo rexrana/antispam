@@ -26,29 +26,8 @@ function _antispam_settings_form() {
   $antispam_deapikey = variable_get('antispam_deapikey', '');
   $service_provider = antispam_get_service_provider();
 
-  switch ($service_provider) {
-    case AKISMET_SERVICE:
-      $apikey = $antispam_wpapikey;
-      $apikeyname = 'antispam_wpapikey';
-      $wpapikey_div_style = 'visibility: visible; overflow: hidden;';
-      $tpapikey_div_style = 'visibility: hidden; height: 0px; overflow: hidden;';
-      $deapikey_div_style = 'visibility: hidden; height: 0px; overflow: hidden;';
-      break;
-    case TYPEPAD_SERVICE:
-      $apikey = $antispam_tpapikey;
-      $apikeyname = 'antispam_tpapikey';
-      $wpapikey_div_style = 'visibility: hidden; height: 0px; overflow: hidden;';
-      $tpapikey_div_style = 'visibility: visible; overflow: hidden;';
-      $deapikey_div_style = 'visibility: hidden; height: 0px; overflow: hidden;';
-      break;
-    case DEFENSIO_SERVICE:
-      $apikey = $antispam_deapikey;
-      $apikeyname = 'antispam_deapikey';
-      $wpapikey_div_style = 'visibility: hidden; height: 0px; overflow: hidden;';
-      $tpapikey_div_style = 'visibility: hidden; height: 0px; overflow: hidden;';
-      $deapikey_div_style = 'visibility: visible; overflow: hidden;';
-      break;
-  }
+  // Validate the current API key.
+  $apikey = antispam_get_api_key($service_provider);
   if (empty($apikey)) {
     $is_valid = TRUE;
   }
@@ -56,6 +35,10 @@ function _antispam_settings_form() {
     $is_valid = (antispam_api_cmd_verify_key($apikey) 
                  == ANTISPAM_API_RESULT_SUCCESS ? TRUE : FALSE);
   }
+
+  // Provide the AntiSpam administration JavaScript.
+  drupal_add_js(drupal_get_path('module', 'antispam') .'/antispam.js');
+
   $service_fieldset_collapsed = FALSE; // always show 
 
   $form['service'] = array(
@@ -71,7 +54,6 @@ function _antispam_settings_form() {
       t('Defensio'),
     ),
     '#default_value' => $service_provider,
-    '#attributes' => array('onclick' => '_antispam_switch_provider_js(this)'),
     '#description' => t('Please select the anti spam service provider. Although they provide the similar services, TypePad AntiSpam service is free even for commercial sites while Akismet and Defensio have some limitations on the commercial usage.'),
   );
   $form['service']['antispam_wpapikey'] = array(
@@ -86,7 +68,7 @@ function _antispam_settings_form() {
         '!akismet-faq' => url('http://akismet.com/faq/'),
       )
     ),
-    '#prefix' => '<div id="div-antispam-wpapikey" style="' . $wpapikey_div_style . '">',
+    '#prefix' => '<div id="antispam-wrapper-0" class="antispam-wrapper">',
     '#suffix' => '</div>',
   );
   $form['service']['antispam_tpapikey'] = array(
@@ -100,7 +82,7 @@ function _antispam_settings_form() {
         '!antispam-faq' => url('http://antispam.typepad.com/info/faq.html'),
       )
     ),
-    '#prefix' => '<div id="div-antispam-tpapikey" style="' . $tpapikey_div_style . '">',
+    '#prefix' => '<div id="antispam-wrapper-1" class="antispam-wrapper">',
     '#suffix' => '</div>',
   );
   $form['service']['antispam_deapikey'] = array(
@@ -114,10 +96,23 @@ function _antispam_settings_form() {
         '!antispam-faq' => url('http://defensio.com/faq'),
       )
     ),
-    '#prefix' => '<div id="div-antispam-deapikey" style="' . $deapikey_div_style . '">',
+    '#prefix' => '<div id="antispam-wrapper-2" class="antispam-wrapper">',
     '#suffix' => '</div>',
   );
+
+  // Give a warning if the active key is not valid.
   if (!empty($apikey) && !$is_valid) {
+    switch ($service_provider) {
+      case 0:
+        $apikeyname = 'antispam_wpapikey';
+        break;
+      case 1:
+        $apikeyname = 'antispam_tpapikey';
+        break;
+      case 2:
+        $apikeyname = 'antispam_deapikey';
+        break;
+    }
     $form['service'][$apikeyname]['#description'] .= '<div class="marker">'. t('<strong>WARNING: Your API Key doesn\'t seem to be valid!</strong>') .'</div>';
   }
 
@@ -753,7 +748,7 @@ function antispam_moderation_form(&$form_state, $mode = '', $submode = '', $sql 
       $form['author'][$content->nid] = array('#value' => theme('username', $content));
       $form['status'][$content->nid] = array('#value' => ($content->status ? t('published') : t('not published')));
       if ($content->spam_mark) {
-        $form['status'][$content->nid]['#value'] .= t('/spam');
+        $form['status'][$content->nid]['#value'] .= '/' . t('spam');
       }
       if (antispam_get_service_provider() == DEFENSIO_SERVICE) {
         $form['spaminess'][$content->nid] = array('#type' => 'markup', '#value' => _antispam_spaminess_bar($content->spaminess));
@@ -764,16 +759,16 @@ function antispam_moderation_form(&$form_state, $mode = '', $submode = '', $sql 
       $items[$content->cid] = '';
       $content->name = $content->uid ? $content->registered_name : $content->name;
       $form['title'][$content->cid] = array(
-        '#value' => l($content->subject, 'node/'. $content->nid, array(
+        '#value' => l($content->subject, 'node/'. $content->cid, array(
           'attributes' => array(
             'title' => truncate_utf8($content->comment, BODY_TOOLTIP_LEN)
           ), 
           'fragment' => 'comment-' . $content->cid,
-         )) .' '. theme('mark', node_mark($content->nid, $content->timestamp)));
+         )) .' '. theme('mark', node_mark($content->cid, $content->timestamp)));
       $form['author'][$content->cid] = array('#value' => theme('username', $content));
       $form['status'][$content->cid] = array('#value' => ($content->status == COMMENT_PUBLISHED ? t('published') : t('not published')));
       if ($content->spam_mark) {
-        $form['status'][$content->cid]['#value'] .= t('/spam');
+        $form['status'][$content->cid]['#value'] .= '/' . t('spam');
       }
       if (antispam_get_service_provider() == DEFENSIO_SERVICE) {
         $form['spaminess'][$content->cid] = array('#type' => 'markup', '#value' => _antispam_spaminess_bar($content->spaminess));
