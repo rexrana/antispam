@@ -759,7 +759,7 @@ function antispam_moderation_form(&$form_state, $mode = '', $submode = '', $sql 
       $items[$content->cid] = '';
       $content->name = $content->uid ? $content->registered_name : $content->name;
       $form['title'][$content->cid] = array(
-        '#value' => l($content->subject, 'node/'. $content->cid, array(
+        '#value' => l($content->subject, 'node/'. $content->nid, array(
           'attributes' => array(
             'title' => truncate_utf8($content->comment, BODY_TOOLTIP_LEN)
           ), 
