@@ -613,7 +613,7 @@ function antispam_callback_queue($mode = '', $submode = '') {
     $counts = antispam_get_total_counter();
     $total_checked = $counts['total_spam'] + $counts['total_ham'];
     $total_false = $counts['total_fnegative'] + $counts['total_fpositive'];
-    $accuracy = $total_checked  ? round(100.0 -((float)$total_false / (float)$total_checked), 2) : 0;
+    $accuracy = $total_checked  ? round(100.0 -((float)$total_false / (float)$total_checked) * 100, 2) : 0;
     $since = variable_get('antispam_counter_since', array('day' => date('j'), 'month' => date('n'), 'year' => date('Y')));
     $start = mktime(0, 0, 0, $since['month'], $since['day'], $since['year']);
     $days = (int)((time() - $start) / (60 * 60 * 24) + 1);
@@ -631,7 +631,7 @@ function antispam_callback_queue($mode = '', $submode = '') {
     $output .= antispam_generate_statistics_graph();
     // footnotes
     $output .= '<p><br /><i>' . t('Note: <strong>False negatives</strong> is the number of spams that were incorrectly tagged as hams, while <strong>false positives</strong> is the number of hams that were incorrectly tagged as spams. These numbers totally depends on your manual operation to retrain the antispam service using <strong>submit as spam</strong> and <strong>submit as ham</strong> feature.') . '</i></p>';
-    $output .= '<p><i>' . t('Note: <strong>Accuracy</strong> is calculated by the following formula:<br /> accuracy(%) = 100 - ((false negative + false positive) / total checked)') . '</i></p>';
+    $output .= '<p><i>' . t('Note: <strong>Accuracy</strong> is calculated by the following formula:<br /> accuracy(%) = 100 - (((false negative + false positive) / total checked) * 100)') . '</i></p>';
    
     return $output;
   }
