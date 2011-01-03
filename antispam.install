@@ -2,7 +2,7 @@
 // $Id$
 
 /**
- * Implementation of hook_schema().
+ * Implements hook_schema().
  */
 function antispam_schema() {
   $schema['antispam_spam_marks'] = array(
@@ -93,8 +93,10 @@ function antispam_schema() {
         'not null' => TRUE,
       ),
       'date' => array(
-        'type' => 'datetime',
+        'type' => 'int',
+        'unsigned' => TRUE,
         'not null' => TRUE,
+        'default' => 0,
       ),
       'provider' => array(
         'type' => 'int',
@@ -133,17 +135,15 @@ function antispam_schema() {
 }
 
 /**
- * Implementation of hook_install().
+ * Implements hook_install().
  */
 function antispam_install() {
-  drupal_install_schema('antispam');
 }
 
 /**
- * Implementation of hook_uninstall().
+ * Implements hook_uninstall().
  */
 function antispam_uninstall() {
-  drupal_uninstall_schema('antispam');
   db_query("DELETE FROM {variable} WHERE name LIKE 'antispam%'");
   cache_clear_all('variables', 'cache');
 }

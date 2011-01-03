@@ -2,14 +2,14 @@ $Id$
 
 INSTALLATION:
 
-1. Create the folder 'modules/antispam'
+1. Create the folder '(drupal-root)/sites/all/modules/antispam'
 
 2. Copy all modules files, keeping directory structure, to the
-   folder 'modules/antispam'
+   folder.
 
 3. Enable the antispam module in 'admin/modules'
 
-4. Visit 'admin/settings/antispam' and enter your API key for the
+4. Visit 'admin/config/antispam' and enter your API key for the
    selected antispam service provider.
    You may wish to review and adapt the other options to suit
    your needs.
