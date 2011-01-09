@@ -41,7 +41,7 @@ define('ANTISPAM_COUNT_FALSE_POSITIVE', 4);
 /**
  * Debug function
  */
-function antispam_debug_log($str)
+function antispam_debug($str)
 {
   if(is_array($str) || is_object($str)) {
     error_log(print_r($str, TRUE) . "\r\n", 3, "/tmp/antispam.txt");
@@ -2108,12 +2108,16 @@ function antispam_prepare_comment_data($content_type, $content, $provider) {
  * Parse response data (in yaml format) from DEFENSIO service
  */
 function _antispam_parse_yaml_response($response, $field = '') {
+  $array = array();
   $lines = explode("\n", $response);
   foreach ($lines as $line) {
     $line = trim($line);
     if ($line != '' && $line != "defensio-result:") {
       $line = preg_replace("/(.*): \"?([^\"]*)\"?/", "$1|$2", $line);
-      list($key, $data) = explode('|', $line);
+      $rec = explode('|', $line);
+      if (!isset($rec[1])) continue; // suppress warning
+      $key = $rec[0];
+      $data = $rec[1];
       $array[$key] = $data;
     }
   }
