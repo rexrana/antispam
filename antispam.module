@@ -886,7 +886,7 @@ function antispam_node_validate($node, $form, &$form_state) {
     $num_condition++;
   }
   if ($antispambot_rules['body'] && !empty($node->body)) {
-    $query->condition('e.body', $node->body[$node->language][0]['value']);
+    $query->condition('e.body_value', $node->body[$node->language][0]['value']);
     $num_condition++;
   }
 
@@ -1434,7 +1434,7 @@ function antispam_notify_moderators($content_type, $content, $is_published, $is_
     $message_args = array(
       '@title-label' => t('Title'),
       '@content-title' => $content->title,
-      '@content-type' => $moderator_types[$content_->type],
+      '@content-type' => $moderator_types[$content->type],
       '!content-link' => url('node/'. $content->nid, array('absolute' => TRUE))
     );
   }
@@ -2011,7 +2011,8 @@ function antispam_prepare_comment_data($content_type, $content, $provider) {
 
   if ($provider == DEFENSIO_SERVICE) {
     // DEFENSIO
-    if ($content->signature != '') {
+    if (isset($content->signature) && $content->signature != '') { // 2011.1.8
+    // if ($content->signature != '') {
       // for submit spam/ham, we only needs signature
       $comment_data = array(
         'signature' => $content->signature,
@@ -2108,14 +2109,13 @@ function antispam_prepare_comment_data($content_type, $content, $provider) {
  * Parse response data (in yaml format) from DEFENSIO service
  */
 function _antispam_parse_yaml_response($response, $field = '') {
-  $array = array();
   $lines = explode("\n", $response);
   foreach ($lines as $line) {
     $line = trim($line);
     if ($line != '' && $line != "defensio-result:") {
       $line = preg_replace("/(.*): \"?([^\"]*)\"?/", "$1|$2", $line);
       $rec = explode('|', $line);
-      if (!isset($rec[1])) continue; // suppress warning
+      if (!isset($rec[1])) continue;
       $key = $rec[0];
       $data = $rec[1];
       $array[$key] = $data;
@@ -2232,7 +2232,7 @@ function antispam_api_cmd_comment_check($content_type, $content) {
     $response = _antispam_api_http_post($query_string, $api_host, '/app/'. DEFENSIO_API_VERSION .'/audit-comment/' . $api_key . '.yaml');
     if (!isset($response[1])) {
       watchdog('antispam', "cheking a content failed: can not get a response back from the service provider " . antispam_get_privider_name($provider, FALSE));
-      return ANTISPAM_API_RESULT_ERROR;
+      return array(ANTISPAM_API_RESULT_ERROR);
     }
     $res_array = _antispam_parse_yaml_response($response[1]);
     $result = array();
@@ -2257,9 +2257,12 @@ function antispam_api_cmd_comment_check($content_type, $content) {
 
     if (!isset($response[1])) {
       watchdog('antispam', "cheking a content failed: can not get a response back from the service provider " . antispam_get_privider_name($provider, FALSE));
-      return ANTISPAM_API_RESULT_ERROR;
+      return array(ANTISPAM_API_RESULT_ERROR);
     }
-    return ('true' == $response[1] ? array(ANTISPAM_API_RESULT_IS_SPAM) : array(ANTISPAM_API_RESULT_IS_HAM));
+    $result[0] = ('true' == $response[1] ? ANTISPAM_API_RESULT_IS_SPAM : ANTISPAM_API_RESULT_IS_HAM);
+    $result[1] = '';  // signature
+    $result[2] = 0.0; // spaminess
+    return $result;
   }
 }
 
