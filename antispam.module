@@ -862,6 +862,7 @@ function antispam_node_validate($node, $form, &$form_state) {
   global $user;
 
   $num_condition = 0;
+  $debug_info = array();
 
   // Ok, let's build a quick query to see if we can catch a spambot.
   $antispambot_rules = antispam_get_anti_spambot_rules();
@@ -870,7 +871,7 @@ function antispam_node_validate($node, $form, &$form_state) {
   if ($antispambot_rules['body']) {
     $query->join('field_data_body', 'e', 'e.entity_id = s.content_id');
   }
-  $query->fields('s');
+  $query->fields('s', array('content_id'));
   if ($antispambot_rules['body']) {
     $query->addField('e', 'body_value', 'body');
   }
@@ -879,24 +880,24 @@ function antispam_node_validate($node, $form, &$form_state) {
 
   if ($antispambot_rules['ip']) {
     $query->condition('s.hostname', ip_address());
+    $debug_info['IP-address'] = ip_address();
     $num_condition++;
   }
   if ($antispambot_rules['mail'] && !empty($user->mail)) {
     $query->condition('s.mail', $user->mail);
+    $debug_info['E-mail'] = $user->mail;
     $num_condition++;
   }
   if ($antispambot_rules['body'] && !empty($node->body)) {
     $query->condition('e.body_value', $node->body[$node->language][0]['value']);
+    $debug_info['Content'] = $node->body[$node->language][0]['value'];
     $num_condition++;
   }
 
   if ($num_condition) {
     $has_rows = $query->execute()->fetchField();
     if ($has_rows) {
-      antispam_anti_spambot_action(array(
-        t('E-mail') => $form_state['values']['mail'],
-        t('Comment') => $form_state['values']['comment']
-      ));
+      antispam_anti_spambot_action($debug_info);
     }
   }
 }
@@ -985,11 +986,13 @@ function antispam_comment_presave($comment) {
   // if this is updating existing comment, then cid is already assigned.
 
   $num_condition = 0;
+  $debug_info = array();
 
   // Ok, let's build a quick query to see if we can catch a spambot.
   $antispambot_rules = antispam_get_anti_spambot_rules();
 
   $query = db_select('antispam_spam_marks', 's');
+  $query->fields('s', array('content_id'));
   if ($antispambot_rules['body']) {
     $query->join('comment', 'c', 's.content_id = c.cid');
   }
@@ -998,24 +1001,24 @@ function antispam_comment_presave($comment) {
 
   if ($antispambot_rules['ip']) {
     $query->condition('s.hostname', ip_address());
+    $debug_info['IP-address'] = ip_address();
     $num_condition++;
   }
   if ($antispambot_rules['mail'] && !empty($comment->mail)) {
     $query->condition('s.mail', $comment->mail);
+    $debug_info['E-mail'] = $comment->mail;
     $num_condition++;
   }
   if ($antispambot_rules['body'] && !empty($comment->comment_body)) {
     $query->condition('c.comment', render($comment->comment_body[$comment->language][0]['value']));
+    $debug_info['Content'] = $comment->mail[$comment->language][0]['value'];
     $num_condition++;
   }
 
   if ($num_condition) {
     $has_rows = $query->execute()->fetchField();
     if ($has_rows) {
-      antispam_anti_spambot_action(array(
-        t('E-mail') => $form_state['values']['mail'],
-        t('Comment') => $form_state['values']['comment']
-      ));
+      antispam_anti_spambot_action($debug_info);
     }
   }
 }
@@ -1521,11 +1524,14 @@ function antispam_form_alter(&$form, &$form_state, $form_id) {
     return;
   }
   $uid = $form['#user']->uid;
-  $antispam_moderator_email_for = $form['#user']->antispam_moderator_email_for;
+  $antispam_moderator_email_for = isset($form['#user']->antispam_moderator_email_for)? $form['#user']->antispam_moderator_email_for : 'approval';
 
   $moderator_email_for_options = _antispam_get_email_for_options();
   $moderator_types = antispam_get_moderator_types(NULL);
   $moderator_types_count = count($moderator_types);
+  if (!$moderator_types_count) {
+    return;
+  }
   $form['antispam_moderator'] = array(
     '#type' => 'fieldset', '#title' => t('AntiSpam moderator settings'),
     '#weight' => 5,
