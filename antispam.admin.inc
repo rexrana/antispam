@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * Truncate size of content body for the tooltip
