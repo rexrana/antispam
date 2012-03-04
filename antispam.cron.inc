@@ -4,9 +4,6 @@
  * Shutdown function executed at cron time.
  */
 function antispam_cron_shutdown() {
-
-  watchdog('cron', 'AntiSpam cron started at %time.', array('%time' => format_date(time(), 'custom', 'H:i:s')));
-
   // Expired content spam that we have to remove from each content repository.
   $expired_content_spam = array('nids' => array(), 'cids' => array());
   // Spam marks that we have to remove from the 'spam marks' table.
@@ -117,5 +114,4 @@ function antispam_cron_shutdown() {
   if ($clear_cache) {
     antispam_clear_cache();
   }
-  watchdog('cron', 'AntiSpam cron completed at %time.', array('%time' => format_date(time(), 'custom', 'H:i:s')));
 }
