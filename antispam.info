@@ -1,12 +1,8 @@
-; $id:
 name = AntiSpam
 description = Use the anti-spam service to protect your site from spam
-core = "7.x"
-
 configure = admin/config/antispam
 
 files[] = antispam.module
 files[] = antispam.admin.inc
 files[] = antispam.cron.inc
 files[] = antispam.install
-
