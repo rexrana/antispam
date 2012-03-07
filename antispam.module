@@ -1984,10 +1984,18 @@ function antispam_content_publish_operation($content_type, $content, $op, $log_a
 
     if ($op == 'publish') {
       comment_publish_action($content, array('cid' => $content->cid));
+      db_update('comment')
+        ->fields(array('status' => COMMENT_PUBLISHED))
+        ->condition('cid', $content->cid)
+        ->execute();
       module_invoke_all('comment_published', $content);
     }
     else if ($op == 'unpublish') {
       comment_unpublish_action($content, array('cid' => $content->cid));
+      db_update('comment')
+        ->fields(array('status' => COMMENT_NOT_PUBLISHED))
+        ->condition('cid', $content->cid)
+        ->execute();
       // Allow modules to respond to the updating of a comment.
       module_invoke_all('comment_unpublished', $content);
     }
