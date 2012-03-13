@@ -1,4 +1,5 @@
 <?php
+user_pre
 
 /**
 * AntiSpam Drupal and Module versions.
@@ -1570,7 +1571,7 @@ function antispam_user_insert(&$edit, $account, $category) {
     if (!isset($moderator_email_for_options[$edit['antispam_moderator_email_for']])) {
       $edit['antispam_moderator_email_for'] = 'approval';
     }
-    $result = db_query("SELECT * FROM {antispam_moderator_email_for} WHERE uid=:uid", array(':uid' => $account->uid));
+    $result = db_query("SELECT * FROM {antispam_moderator} WHERE uid=:uid", array(':uid' => $account->uid));
     if ($result->rowCount()) {
       // update
       db_update('antispam_moderator')
