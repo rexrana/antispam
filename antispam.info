@@ -1,7 +1,7 @@
 name = AntiSpam
 description = Use the anti-spam service to protect your site from spam
 configure = admin/config/antispam
-
+core = 7.x
 files[] = antispam.module
 files[] = antispam.admin.inc
 files[] = antispam.cron.inc
