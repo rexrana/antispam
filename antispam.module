@@ -3,7 +3,7 @@
 /**
 * AntiSpam Drupal and Module versions.
 */
-define('ANTISPAM_DRUPAL_VERSION', '6');
+define('ANTISPAM_DRUPAL_VERSION', '7');
 define('ANTISPAM_MODULE_VERSION', '1.0');
 define('ANTISPAM_MODULE_HOMEURL', 'http://www.drupal.org/project/antispam');
 define('ANTISPAM_MODULE_USERAGENT', 'Drupal/'. ANTISPAM_DRUPAL_VERSION .' | antispam.module/'. ANTISPAM_MODULE_VERSION);
