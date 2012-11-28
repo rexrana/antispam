@@ -2163,7 +2163,7 @@ function antispam_api_cmd_verify_key($key, $provider) {
     $request = 'owner-url='. $base_url . base_path();
     $response = _antispam_api_http_post($request, $api_host, '/blog/'. DEFENSIO_API_VERSION .'/validate-key/' . $key . '.yaml');
     if (!isset($response[1])) {
-      watchdog('antispam', "verifying a key: can not get a response back from the service provider " . antispam_get_privider_name($provider, FALSE));
+      watchdog('antispam', "verifying a key: can not get a response back from the service provider " . antispam_get_provider_name($provider, FALSE));
       return ANTISPAM_API_RESULT_ERROR;
     }
     return (_antispam_parse_yaml_response($response[1], 'status') == 'success' ? ANTISPAM_API_RESULT_SUCCESS : ANTISPAM_API_RESULT_ERROR);
@@ -2173,7 +2173,7 @@ function antispam_api_cmd_verify_key($key, $provider) {
     $request = 'key='. $key .'&blog='. $base_url . base_path();
     $response = _antispam_api_http_post($request, $api_host, '/'. AKISMET_API_VERSION .'/verify-key');
     if (!isset($response[1])) {
-      watchdog('antispam', "verifying a key: can not get a response back from the service provider " . antispam_get_privider_name($provider, FALSE));
+      watchdog('antispam', "verifying a key: can not get a response back from the service provider " . antispam_get_provider_name($provider, FALSE));
       return ANTISPAM_API_RESULT_ERROR;
     }
     return ('valid' == $response[1] ? ANTISPAM_API_RESULT_SUCCESS : ANTISPAM_API_RESULT_ERROR);
@@ -2244,7 +2244,7 @@ function antispam_api_cmd_comment_check($content_type, $content) {
     $query_string = _antispam_api_build_query_string($comment_data);
     $response = _antispam_api_http_post($query_string, $api_host, '/app/'. DEFENSIO_API_VERSION .'/audit-comment/' . $api_key . '.yaml');
     if (!isset($response[1])) {
-      watchdog('antispam', "cheking a content failed: can not get a response back from the service provider " . antispam_get_privider_name($provider, FALSE));
+      watchdog('antispam', "cheking a content failed: can not get a response back from the service provider " . antispam_get_provider_name($provider, FALSE));
       return array(ANTISPAM_API_RESULT_ERROR);
     }
     $res_array = _antispam_parse_yaml_response($response[1]);
@@ -2257,7 +2257,7 @@ function antispam_api_cmd_comment_check($content_type, $content) {
     }
     else {
       $out = print_r($res_array, TRUE);
-      watchdog('antispam', "cheking a content failed: unexpected response is returned from the service provider " . antispam_get_privider_name($provider, FALSE) . ": " . $out);
+      watchdog('antispam', "cheking a content failed: unexpected response is returned from the service provider " . antispam_get_provider_name($provider, FALSE) . ": " . $out);
       return array(ANTISPAM_API_RESULT_ERROR);
     }
   }
@@ -2269,7 +2269,7 @@ function antispam_api_cmd_comment_check($content_type, $content) {
     $response = _antispam_api_http_post($query_string, $host, '/'. AKISMET_API_VERSION .'/comment-check');
 
     if (!isset($response[1])) {
-      watchdog('antispam', "cheking a content failed: can not get a response back from the service provider " . antispam_get_privider_name($provider, FALSE));
+      watchdog('antispam', "cheking a content failed: can not get a response back from the service provider " . antispam_get_provider_name($provider, FALSE));
       return array(ANTISPAM_API_RESULT_ERROR);
     }
     $result[0] = ('true' == $response[1] ? ANTISPAM_API_RESULT_IS_SPAM : ANTISPAM_API_RESULT_IS_HAM);
@@ -2304,7 +2304,7 @@ function antispam_api_cmd_submit_spam($content_type, $content) {
     $query_string = _antispam_api_build_query_string($comment_data);
     $response = _antispam_api_http_post($query_string, $api_host, '/blog/'. DEFENSIO_API_VERSION .'/report-false-negatives/' . $api_key . '.yaml');
     if (!isset($response[1])) {
-      watchdog('antispam', "submitting spam: can not get a response back from the service provider " . antispam_get_privider_name($provider, FALSE));
+      watchdog('antispam', "submitting spam: can not get a response back from the service provider " . antispam_get_provider_name($provider, FALSE));
       return ANTISPAM_API_RESULT_ERROR;
     }
     return (_antispam_parse_yaml_response($response[1], 'status') == 'success' ? ANTISPAM_API_RESULT_SUCCESS : ANTISPAM_API_RESULT_ERROR);
@@ -2315,7 +2315,7 @@ function antispam_api_cmd_submit_spam($content_type, $content) {
     $host = $api_key .'.'. $api_host;
     $response = _antispam_api_http_post($query_string, $host, '/'. AKISMET_API_VERSION .'/submit-spam');
     if (!isset($response[1])) {
-      watchdog('antispam', "submitting spam: can not get a response back from the service provider " . antispam_get_privider_name($provider, FALSE));
+      watchdog('antispam', "submitting spam: can not get a response back from the service provider " . antispam_get_provider_name($provider, FALSE));
       return ANTISPAM_API_RESULT_ERROR;
     }
     else {
@@ -2349,7 +2349,7 @@ function antispam_api_cmd_submit_ham($content_type, $content) {
     $query_string = _antispam_api_build_query_string($comment_data);
     $response = _antispam_api_http_post($query_string, $api_host, '/blog/'. DEFENSIO_API_VERSION .'/report-false-positives/' . $api_key . '.yaml');
     if (!isset($response[1])) {
-      watchdog('antispam', "submitting ham: can not get a response back from the service provider " . antispam_get_privider_name($provider, FALSE));
+      watchdog('antispam', "submitting ham: can not get a response back from the service provider " . antispam_get_provider_name($provider, FALSE));
       return ANTISPAM_API_RESULT_ERROR;
     }
     return (_antispam_parse_yaml_response($response[1], 'status') == 'success' ? ANTISPAM_API_RESULT_SUCCESS : ANTISPAM_API_RESULT_ERROR);
@@ -2360,7 +2360,7 @@ function antispam_api_cmd_submit_ham($content_type, $content) {
     $host = $api_key .'.'. $api_host;
     $response = _antispam_api_http_post($query_string, $host, '/'. AKISMET_API_VERSION .'/submit-ham');
     if (!isset($response[1])) {
-      watchdog('antispam', "submitting ham: can not get a response back from the service provider " . antispam_get_privider_name($provider, FALSE));
+      watchdog('antispam', "submitting ham: can not get a response back from the service provider " . antispam_get_provider_name($provider, FALSE));
       return ANTISPAM_API_RESULT_ERROR;
     }
     else {
