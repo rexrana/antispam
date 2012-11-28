@@ -1104,7 +1104,7 @@ function _antispam_comment_save($comment) {
 */
 function antispam_comment_delete($comment) {
   db_delete('antispam_spam_marks')
-    ->condition('content_type', 'node')
+    ->condition('content_type', 'comment')
     ->condition('content_id', $comment->cid)
     ->execute();
 }
