@@ -96,4 +96,27 @@ class AntispamCommentTest extends AntispamTestBase {
     $this->assertText(variable_get('anonymous', t('Anonymous')), 'The anonymous user name was found.');
   }
 
+  /**
+   * Tests that user signatures are unaffected by antispam.
+   */
+  protected function testCommentUserSignatures() {
+    variable_set('user_signatures', TRUE);
+    $this->drupalLogin($this->adminUser);
+    $signature_text = $this->randomName();
+    $edit = array(
+      'signature[value]' => $signature_text,
+    );
+    $this->drupalPost('user/' . $this->adminUser->uid . '/edit', $edit, t('Save'));
+
+    $edit = array(
+      'comment_body[' . LANGUAGE_NONE . '][0][value]' => $this->randomName(),
+      'subject' => $this->randomName(),
+    );
+    $node = $this->drupalCreateNode();
+    $this->drupalGet('comment/reply/' . $node->nid);
+    $this->drupalPost(NULL, $edit, t('Save'));
+
+    $this->assertText($signature_text, 'The user signature was found on the comment.');
+  }
+
 }

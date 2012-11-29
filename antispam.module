@@ -963,7 +963,6 @@ function antispam_comment_load($comments) {
       $comment->spaminess = $rec->spaminess;
     }
     else {
-      $comment->signature = '';
       $comment->spaminess = 0.0;
     }
   }
