@@ -966,9 +966,6 @@ function antispam_comment_load($comments) {
       $comment->signature = '';
       $comment->spaminess = 0.0;
     }
-    if ($comment->uid == 0) {
-      $comment->name = variable_get('anonymous', t('Anonymous'));
-    }
   }
 }
 

@@ -1,0 +1,99 @@
+<?php
+
+/**
+ * @file
+ * Tests for antispam.module.
+ */
+
+/**
+ * Provides a base class for Antispam tests.
+ */
+class AntispamTestBase extends DrupalWebTestCase {
+
+  protected function setUp() {
+    $modules = func_get_args();
+    if (isset($modules[0]) && is_array($modules[0])) {
+      $modules = $modules[0];
+    }
+    $modules[] = 'antispam';
+    parent::setUp($modules);
+
+    // Set basic variables.
+    variable_set('antispam_check_nodetypes', array('page' => 'page'));
+    variable_set('antispam_antispambot_rules', array('ip' => FALSE, 'mail' => FALSE, 'body' => FALSE));
+  }
+
+}
+
+/**
+ * Tests antispam functionality for comments.
+ */
+class AntispamCommentTest extends AntispamTestBase {
+
+  /**
+   * An admin user.
+   *
+   * @var \stdClass
+   */
+  protected $adminUser;
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Comment antispam',
+      'description' => 'Tests antispam functionality for comments.',
+      'group' => 'Antispam',
+    );
+  }
+
+  protected function setUp() {
+    parent::setUp(array('comment'));
+
+    $this->adminUser = $this->drupalCreateUser(array('administer antispam settings', 'administer site configuration', 'administer comments'));
+  }
+
+  /**
+   * Tests antispam functionality for anonymously posted comments.
+   */
+  protected function testAnonymousComments() {
+    // Allow anonymous users to post comments.
+    user_role_change_permissions(DRUPAL_ANONYMOUS_RID, array(
+      'access comments' => TRUE,
+      'post comments' => TRUE,
+      'skip comment approval' => FALSE,
+    ));
+
+
+    // Post a comment with a name.
+    $edit = array(
+      'comment_body[' . LANGUAGE_NONE . '][0][value]' => $this->randomName(),
+      'subject' => $this->randomName(),
+      'name' => $this->randomName(),
+    );
+    $node = $this->drupalCreateNode();
+    $this->drupalGet('comment/reply/' . $node->nid);
+    $this->drupalPost(NULL, $edit, t('Save'));
+
+    // Log in as an admin user and view the node.
+    $this->drupalLogin($this->adminUser);
+    $this->drupalGet('node/' . $node->nid);
+
+    $this->assertText($edit['name'], 'The submitted name of the anonymous user was found.');
+    $this->drupalLogout();
+
+    // Post a comment without a name.
+    $edit = array(
+      'comment_body[' . LANGUAGE_NONE . '][0][value]' => $this->randomName(),
+      'subject' => $this->randomName(),
+    );
+    $node = $this->drupalCreateNode();
+    $this->drupalGet('comment/reply/' . $node->nid);
+    $this->drupalPost(NULL, $edit, t('Save'));
+
+    // Log in as an admin user and view the node.
+    $this->drupalLogin($this->adminUser);
+    $this->drupalGet('node/' . $node->nid);
+
+    $this->assertText(variable_get('anonymous', t('Anonymous')), 'The anonymous user name was found.');
+  }
+
+}
