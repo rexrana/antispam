@@ -52,6 +52,26 @@ class AntispamCommentTest extends AntispamTestBase {
   }
 
   /**
+   * Tests antispam functionality for moderating comments.
+   */
+  protected function testCommentModeration() {
+    // Post a comment as the admin user.
+    $this->drupalLogin($this->adminUser);
+    $edit = array(
+      'comment_body[' . LANGUAGE_NONE . '][0][value]' => $this->randomName(),
+      'subject' => $this->randomName(),
+    );
+    $node = $this->drupalCreateNode();
+    $this->drupalGet('comment/reply/' . $node->nid);
+    $this->drupalPost(NULL, $edit, t('Save'));
+
+    $this->drupalGet('admin/content/antispam/comments/published');
+
+    $this->assertNoText(variable_get('anonymous', t('Anonymous')), 'The anonymous user name was not found.');
+    $this->assertText($this->adminUser->name, 'The admin user name was found.');
+  }
+
+  /**
    * Tests antispam functionality for anonymously posted comments.
    */
   protected function testAnonymousComments() {
