@@ -139,4 +139,23 @@ class AntispamCommentTest extends AntispamTestBase {
     $this->assertText($signature_text, 'The user signature was found on the comment.');
   }
 
+  /**
+   * Tests the anti-spambot options.
+   */
+  protected function testSpambotOptions() {
+    // Post a comment while existing spam content is used to determine spambots.
+    variable_set('antispam_antispambot_rules', array('ip' => FALSE, 'mail' => FALSE, 'body' => 'body'));
+    $this->drupalLogin($this->adminUser);
+
+    $edit = array(
+      'comment_body[' . LANGUAGE_NONE . '][0][value]' => $this->randomName(),
+      'subject' => $this->randomName(),
+    );
+    $node = $this->drupalCreateNode();
+    $this->drupalGet('comment/reply/' . $node->nid);
+    $this->drupalPost(NULL, $edit, t('Save'));
+
+    $this->assertText(t('Your comment has been posted'));
+  }
+
 }
