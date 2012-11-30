@@ -546,46 +546,48 @@ function antispam_menu() {
     'weight' => 2,
     'file' => 'antispam.admin.inc',
   );
-  $items['admin/content/antispam/comments'] = array(
-    'title' => t('Comments'),
-    'page callback' => 'antispam_callback_queue',
-    'page arguments' => array('comments'),
-    'access callback' => '_antispam_is_moderator',
-    'access arguments' => array($moderator_types, 'comments'),
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 2,
-    'file' => 'antispam.admin.inc',
-  );
-  $items['admin/content/antispam/comments/spam'] = array(
-    'title' => t('Spam'),
-    'page callback' => 'antispam_callback_queue',
-    'page arguments' => array('comments'),
-    'access callback' => '_antispam_is_moderator',
-    'access arguments' => array($moderator_types, 'comments'),
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => 0,
-    'file' => 'antispam.admin.inc',
-  );
-  $items['admin/content/antispam/comments/unpublished'] = array(
-    'title' => t('Unpublished comments'),
-    'page callback' => 'antispam_callback_queue',
-    'page arguments' => array('comments', 'unpublished'),
-    'access callback' => '_antispam_is_moderator',
-    'access arguments' => array($moderator_types, 'comments'),
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 1,
-    'file' => 'antispam.admin.inc',
-  );
-  $items['admin/content/antispam/comments/published'] = array(
-    'title' => t('Published comments'),
-    'page callback' => 'antispam_callback_queue',
-    'page arguments' => array('comments', 'published'),
-    'access callback' => '_antispam_is_moderator',
-    'access arguments' => array($moderator_types, 'comments'),
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 2,
-    'file' => 'antispam.admin.inc',
-  );
+  if (module_exists('comment')) {
+    $items['admin/content/antispam/comments'] = array(
+      'title' => t('Comments'),
+      'page callback' => 'antispam_callback_queue',
+      'page arguments' => array('comments'),
+      'access callback' => '_antispam_is_moderator',
+      'access arguments' => array($moderator_types, 'comments'),
+      'type' => MENU_LOCAL_TASK,
+      'weight' => 2,
+      'file' => 'antispam.admin.inc',
+    );
+    $items['admin/content/antispam/comments/spam'] = array(
+      'title' => t('Spam'),
+      'page callback' => 'antispam_callback_queue',
+      'page arguments' => array('comments'),
+      'access callback' => '_antispam_is_moderator',
+      'access arguments' => array($moderator_types, 'comments'),
+      'type' => MENU_DEFAULT_LOCAL_TASK,
+      'weight' => 0,
+      'file' => 'antispam.admin.inc',
+    );
+    $items['admin/content/antispam/comments/unpublished'] = array(
+      'title' => t('Unpublished comments'),
+      'page callback' => 'antispam_callback_queue',
+      'page arguments' => array('comments', 'unpublished'),
+      'access callback' => '_antispam_is_moderator',
+      'access arguments' => array($moderator_types, 'comments'),
+      'type' => MENU_LOCAL_TASK,
+      'weight' => 1,
+      'file' => 'antispam.admin.inc',
+    );
+    $items['admin/content/antispam/comments/published'] = array(
+      'title' => t('Published comments'),
+      'page callback' => 'antispam_callback_queue',
+      'page arguments' => array('comments', 'published'),
+      'access callback' => '_antispam_is_moderator',
+      'access arguments' => array($moderator_types, 'comments'),
+      'type' => MENU_LOCAL_TASK,
+      'weight' => 2,
+      'file' => 'antispam.admin.inc',
+    );
+  }
   $items['admin/content/antispam/statistics'] = array(
     'title' => t('Statistics'),
     'page callback' => 'antispam_callback_queue',
@@ -1313,7 +1315,7 @@ function antispam_get_moderator_types($account = NULL) {
       }
     }
 
-    if (user_access('administer comments', $account) || user_access('moderate spam in comments', $account)) {
+    if (module_exists('comment') && (user_access('administer comments', $account) || user_access('moderate spam in comments', $account))) {
       $moderator_types[$account->uid]['comments'] = t('comments');
     }
   }

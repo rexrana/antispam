@@ -550,10 +550,10 @@ function antispam_callback_queue($mode = '', $submode = '') {
           $query->isNotNull('s.content_id');            
         }
         else if ($key == 'unpublished') {
-          $query->condition('n.status', COMMENT_NOT_PUBLISHED);
+          $query->condition('n.status', NODE_NOT_PUBLISHED);
         }
         else if ($key == 'published') {
-          $query->condition('n.status', COMMENT_PUBLISHED);
+          $query->condition('n.status', NODE_PUBLISHED);
         }
         $query->addTag('node_access');
         $count = $query->countQuery()->execute()->fetchField();
@@ -717,7 +717,7 @@ function antispam_moderation_form($form, &$form_state, $mode = '', $submode = ''
 
     $query = db_select('node', 'n');
     $query->join('users', 'u', 'u.uid = n.uid');
-    $query->join('field_data_body', 'e', 'e.entity_id = n.nid');
+    $query->leftJoin('field_data_body', 'e', 'e.entity_id = n.nid');
     $query->leftJoin('antispam_spam_marks', 's', 's.content_id = n.nid AND s.content_type = :type', array(':type' => 'node'));
     $query->fields('n');
     $query->addField('u', 'name', 'registered_name');

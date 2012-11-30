@@ -10,6 +10,8 @@
  */
 class AntispamTestBase extends DrupalWebTestCase {
 
+  protected $profile = 'testing';
+
   protected function setUp() {
     $modules = func_get_args();
     if (isset($modules[0]) && is_array($modules[0])) {
@@ -21,6 +23,64 @@ class AntispamTestBase extends DrupalWebTestCase {
     // Set basic variables.
     variable_set('antispam_check_nodetypes', array('page' => 'page'));
     variable_set('antispam_antispambot_rules', array('ip' => FALSE, 'mail' => FALSE, 'body' => FALSE));
+  }
+
+}
+
+/**
+ * Tests antispam functionality for nodes.
+ */
+class AntispamNodeTest extends AntispamTestBase {
+
+  /**
+   * An admin user.
+   *
+   * @var \stdClass
+   */
+  protected $adminUser;
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Node antispam',
+      'description' => 'Tests antispam functionality for nodes.',
+      'group' => 'Antispam',
+    );
+  }
+
+  protected function setUp() {
+    parent::setUp(array('node'));
+
+    $this->drupalCreateContentType(array('type' => 'page'));
+
+    $this->adminUser = $this->drupalCreateUser(array('administer antispam settings', 'administer site configuration', 'administer nodes', 'bypass node access', 'access administration pages', 'access content overview'));
+  }
+
+  /**
+   * Tests antispam functionality for moderating comments.
+   */
+  protected function testNodeModeration() {
+    variable_set('antispam_node_publish_links', TRUE);
+    variable_set('antispam_node_spam_links', TRUE);
+    $langcode = LANGUAGE_NONE;
+
+    // Post a node as the admin user.
+    $this->drupalLogin($this->adminUser);
+    $edit = array(
+      'title' => $this->randomName(),
+    );
+    $this->drupalPost('node/add/page', $edit, t('Save'));
+    $node = $this->drupalGetNodeByTitle($edit['title']);
+
+    $this->drupalGet('admin/content/antispam/nodes/published');
+    $this->assertResponse(200);
+
+    $this->assertText($edit['title'], 'Published node found.');
+
+    $this->drupalGet('node/' . $node->nid);
+    $this->clickLink(t('Submit spam'));
+
+    $this->drupalGet('admin/content/antispam/nodes/spam');
+    $this->assertResponse(200);
   }
 
 }
@@ -46,9 +106,10 @@ class AntispamCommentTest extends AntispamTestBase {
   }
 
   protected function setUp() {
-    parent::setUp(array('comment'));
+    parent::setUp(array('node', 'comment'));
 
-    $this->adminUser = $this->drupalCreateUser(array('administer antispam settings', 'administer site configuration', 'administer comments'));
+    $this->drupalCreateContentType(array('type' => 'page'));
+    $this->adminUser = $this->drupalCreateUser(array('administer antispam settings', 'administer site configuration', 'administer comments', 'post comments', 'skip comment approval'));
   }
 
   /**
