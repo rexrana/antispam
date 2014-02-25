@@ -1,4 +1,10 @@
 <?php
+/**
+ * @file
+ * The antispam cron code.
+ *
+ * Module crone functions.
+ */
 
 /**
  * Shutdown function executed at cron time.
@@ -55,8 +61,9 @@ function antispam_cron_shutdown() {
       }
     }
     if ($delete_count > 0) {
-      $message = t('AntiSpam housekeeping') .': '. format_plural($delete_count, '1 expired spam node removed from database', '@count expired spam nodes removed from database').
-        '<br />'.t('Node ID List: %nids', array('%nids' => implode(',', $deleted_items)));
+      $message = t('AntiSpam housekeeping') . ': ' . format_plural($delete_count, '1 expired spam node removed from database', '@count expired spam nodes removed from database') .
+        '<br />'
+        . t('Node ID List: %nids', array('%nids' => implode(',', $deleted_items)));
       watchdog('cron', $message);
       $clear_cache = TRUE;
     }
@@ -71,8 +78,9 @@ function antispam_cron_shutdown() {
       }
     }
     if ($delete_count > 0) {
-      $message = t('AntiSpam housekeeping') .': '. format_plural($delete_count, '1 expired spam comment removed from database', '@count expired spam comments removed from database').
-        '<br />'.t('Comment ID List: %cids', array('%cids' => implode(',', $deleted_items)));
+      $message = t('AntiSpam housekeeping') . ': ' . format_plural($delete_count, '1 expired spam comment removed from database', '@count expired spam comments removed from database') .
+        '<br />'
+        . t('Comment ID List: %cids', array('%cids' => implode(',', $deleted_items)));
       watchdog('cron', $message);
       $clear_cache = TRUE;
     }
@@ -99,12 +107,14 @@ function antispam_cron_shutdown() {
       ->execute();
   }
   if ($spam_marks_removed > 0) {
-    $message = t('AntiSpam housekeeping') .': '. format_plural($spam_marks_removed, '1 spam mark removed from database', '@count spam marks removed from database');
+    $message = t('AntiSpam housekeeping') . ': ' . format_plural($spam_marks_removed, '1 spam mark removed from database', '@count spam marks removed from database');
     if (isset($spam_nids_list)) {
-      $message .= '<br />'. t('Node ID List: %nids', array('%nids' => $spam_nids_list));
+      $message .= '<br />';
+      $message .= t('Node ID List: %nids', array('%nids' => $spam_nids_list));
     }
     if (isset($spam_cids_list)) {
-      $message .= '<br />'. t('Comment ID List: %cids', array('%cids' => $spam_cids_list));
+      $message .= '<br />';
+      $message .= t('Comment ID List: %cids', array('%cids' => $spam_cids_list));
     }
     watchdog('cron', $message);
     $clear_cache = TRUE;

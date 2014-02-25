@@ -15,6 +15,8 @@ By tim.plunkett: Fix file permissions.
 By DamienMcKenna: Added a CHANGELOG.txt file.
 #1062624 by DamienMcKenna, andrewadams2099: Correct settings path in info file.
 #2204421 by DamienMcKenna: Cleaned up the info file.
+#1349574 by mgifford, DamienMcKenna: Wealth of small fixes to match the Drupal
+  coding standards.
 
 
 AntiSpam 7.x-1.5, 2012-07-09
