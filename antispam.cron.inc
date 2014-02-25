@@ -2,8 +2,6 @@
 /**
  * @file
  * The antispam cron code.
- *
- * Module crone functions.
  */
 
 /**
@@ -15,7 +13,8 @@ function antispam_cron_shutdown() {
   // Spam marks that we have to remove from the 'spam marks' table.
   $obsolete_spam_marks = array('nids' => array(), 'cids' => array());
 
-  // Retrieve the list of expired content spam, based on the age specified in the settings panel.
+  // Retrieve the list of expired content spam, based on the age specified in
+  // the settings panel.
   $expire_spam_age = variable_get('antispam_remove_spam_age', 259200);
   if ($expire_spam_age > 0) {
     $result = db_query('SELECT content_type, content_id FROM {antispam_spam_marks} WHERE spam_created < :spam_created', array(':spam_created' => time() - $expire_spam_age));
@@ -26,11 +25,12 @@ function antispam_cron_shutdown() {
     }
   }
 
-  // Deal with possible spam marks for content that have already been removed from database.
-  // Note: when Drupal deletes a node, all its comments are deleted, but no hook is invoked,
-  // so that may lead to orphans in the 'spam marks' table.
-  // This is why this cron task is being more complex that it could really be. Anyway, these
-  // queries shouldn't be too heavy.
+  // Deal with possible spam marks for content that have already been removed
+  // from database.
+  // Note: when Drupal deletes a node, all its comments are deleted, but no
+  // hook is invoked, so that may lead to orphans in the 'spam marks' table.
+  // This is why this cron task is being more complex that it could really be.
+  // Anyway, these queries shouldn't be too heavy.
   $result = db_query('SELECT s.content_id FROM {antispam_spam_marks} s LEFT JOIN {node} n ON s.content_id = n.nid WHERE s.content_type = \'node\' AND n.nid IS NULL');
   foreach ($result as $s) {
     if (!in_array($s->content_id, $obsolete_spam_marks['nids'])) {
