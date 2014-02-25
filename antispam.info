@@ -1,6 +1,6 @@
 name = AntiSpam
 description = Use the anti-spam service to protect your site from spam
-configure = admin/config/antispam
+configure = admin/config/spamprevention/antispam
 core = 7.x
 files[] = antispam.module
 files[] = antispam.admin.inc
