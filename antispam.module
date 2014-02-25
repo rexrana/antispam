@@ -2240,12 +2240,13 @@ function antispam_api_cmd_spam_check($body, $name = NULL, $mail = NULL, $homepag
   if (empty($api_key)) {
     return array(ANTISPAM_API_RESULT_ERROR);
   }
-  $content = array(
-    'body' => $body,
-    'name' => $name,
-    'mail' => $mail,
-    'homepage' => $homepage,
-  );
+
+  $content = new stdClass();
+  $content->body = $body;
+  $content->name = $name;
+  $content->mail = $mail;
+  $content->homepage = $homepage;
+
   $api_result = antispam_api_cmd_comment_check('other', $content);
   if ($api_result[0] == ANTISPAM_API_RESULT_IS_HAM) {
     return 0;

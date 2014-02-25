@@ -18,6 +18,8 @@ By DamienMcKenna: Added a CHANGELOG.txt file.
 #1349574 by mgifford, DamienMcKenna: Wealth of small fixes to match the Drupal
   coding standards.
 #2194633 by Growiel, DamienMcKenna: Update node revision when node updated.
+#2108131 by Nitebreed, DamienMcKenna: antispam_prepare_comment_data requires an
+  object, so antispam_api_cmd_spam_check must pass it an object.
 
 
 AntiSpam 7.x-1.5, 2012-07-09
