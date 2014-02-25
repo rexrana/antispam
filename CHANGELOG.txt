@@ -14,6 +14,7 @@ By tim.plunkett: Fix file permissions.
 #1854558 by tim.plunkett: Remove the hardcoded dependencies on comment.module.
 By DamienMcKenna: Added a CHANGELOG.txt file.
 #1062624 by DamienMcKenna, andrewadams2099: Correct settings path in info file.
+#2204421 by DamienMcKenna: Cleaned up the info file.
 
 
 AntiSpam 7.x-1.5, 2012-07-09
