@@ -17,6 +17,7 @@ By DamienMcKenna: Added a CHANGELOG.txt file.
 #2204421 by DamienMcKenna: Cleaned up the info file.
 #1349574 by mgifford, DamienMcKenna: Wealth of small fixes to match the Drupal
   coding standards.
+#2194633 by Growiel, DamienMcKenna: Update node revision when node updated.
 
 
 AntiSpam 7.x-1.5, 2012-07-09

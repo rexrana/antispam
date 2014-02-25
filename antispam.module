@@ -1996,10 +1996,22 @@ function antispam_content_publish_operation($content_type, $content, $op, $log_a
     // Perform the update action.
     db_update('node')
       ->fields(array(
-        'status' => ($op == 'publish'? 1:0)
+        'status' => ($op == 'publish' ? 1 : 0)
       ))
       ->condition('nid', $content->nid)
       ->execute();
+
+    // Perform the update action of the revision.
+    db_update('node_revision')
+      ->fields(array(
+        'status' => ($op == 'publish' ? 1 : 0)
+      ))
+      ->condition('nid', $content->nid)
+      ->condition('vid', $content->vid)
+      ->execute();
+
+    // Reset the cache for the updated node in order to update the dmin views.
+    entity_get_controller('node')->resetCache(array($content->nid));
 
     if ($log_action) {
       $action = ($op == 'publish' ? t('Content published') : t('Content unpublished'));
