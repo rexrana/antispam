@@ -730,6 +730,22 @@ function antispam_callback_set_spam_status($content_type, $object, $op) {
   }
 }
 
+/**
+ * Webform: Check submitted values for spam.
+ */
+function antispam_webform_check($form, &$form_state) {
+  if (variable_get('antispam_webform_enabled', FALSE)) {
+    foreach ($form_state['values']['submitted'] as $value) {
+      if (is_string($value) && !is_numeric($value) && strlen($value) > 5 && antispam_api_cmd_spam_check($value) === ANTISPAM_API_RESULT_IS_SPAM) {
+        watchdog('spam detected', "Spam detected in webform value '%value'", array('%value' => $value), WATCHDOG_NOTICE);
+        form_error($form_state['clicked_button'], t('Invalid input'));
+        return;
+      }
+    }
+  }
+}
+
+
 /*******************************************************************************
  * Node operations
  ******************************************************************************/
@@ -1518,6 +1534,11 @@ function _antispam_get_email_for_options() {
  * Implements hook_form_alter().
  */
 function antispam_form_alter(&$form, &$form_state, $form_id) {
+  // Add anti-spam integration to webforms.
+  if (strpos($form_id, 'webform_client_form_') !== FALSE) {
+    $form['#validate'][] = 'antispam_webform_check';
+  }
+
   if (!($form_id == 'user_register_form' || $form_id == 'user_profile_form')) {
     return;
   }

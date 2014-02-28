@@ -178,6 +178,15 @@ function antispam_settings_form() {
     '#default_value' => variable_get('antispam_email_enabled', 1),
     '#description' => t('Use this option to <em>enable</em> or <em>disable</em> e-mail notifications to content moderators. If enabled, users with proper permissions are allowed to set, from their user profiles, whether they wish to receive e-mail notications for all new (or updated) posts, just for content needing approval or no notifications at all. Users are notified about content types they are allowed to moderate only.')
   );
+  // Optional integration with Webform.
+  if (module_enabled('webform')) {
+    $form['general']['antispam_webform_enabled'] = array(
+      '#type' => 'checkbox',
+      '#title' => 'Webform integration',
+      '#default_value' => variable_get('antispam_webform_enabled', FALSE),
+      '#description' => t('Optionally check all text values submitted as Webform fields.'),
+    );
+  }
 
   $form['node_options'] = array(
     '#type' => 'fieldset', '#title' => t('Node Options'),
