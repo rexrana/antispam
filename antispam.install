@@ -10,9 +10,9 @@
 function antispam_requirements($phase) {
   $t = get_t();
 
-  $provider = antispam_get_service_provider();
-
   if ($phase == 'runtime') {
+    $provider = antispam_get_service_provider();
+
     if ($provider == AKISMET_SERVICE) {
       if (variable_get('antispam_wpapikey', '') == '') {
         $requirements['antispam_key'] = array(
