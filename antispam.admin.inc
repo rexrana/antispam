@@ -179,7 +179,7 @@ function antispam_settings_form() {
     '#description' => t('Use this option to <em>enable</em> or <em>disable</em> e-mail notifications to content moderators. If enabled, users with proper permissions are allowed to set, from their user profiles, whether they wish to receive e-mail notications for all new (or updated) posts, just for content needing approval or no notifications at all. Users are notified about content types they are allowed to moderate only.')
   );
   // Optional integration with Webform.
-  if (module_enabled('webform')) {
+  if (module_exists('webform')) {
     $form['general']['antispam_webform_enabled'] = array(
       '#type' => 'checkbox',
       '#title' => 'Webform integration',

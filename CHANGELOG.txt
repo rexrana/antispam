@@ -23,6 +23,8 @@ By DamienMcKenna: Added a CHANGELOG.txt file.
 #1787068 by DamienMcKenna, Chris Maissan: Webform integration.
 #2213801 by DamienMcKenna: Fixed hook_requirements so it doesn't fail during
   installation.
+#1787068 by DamienMcKenna: Follow-up for incorrect function name.
+
 
 AntiSpam 7.x-1.5, 2012-07-09
 ----------------------------
