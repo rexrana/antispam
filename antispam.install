@@ -29,22 +29,6 @@ function antispam_requirements($phase) {
         return $requirements;
       }
     }
-    elseif ($provider == DEFENSIO_SERVICE) {
-      if (variable_get('antispam_deapikey', '') == '') {
-        $requirements['antispam_key'] = array(
-          'title' => t('Defensio AntiSpam API key'),
-          'value' => t('Not present'),
-          '#description' => t("Defensio spam protection service requires a <a href='!defensio-com'>Defensio API key</a> to function. Obtain a key by signing up for a free account at <a href='!defensio-key'>Defensio.com</a> and get your free Defensio API key there, then enter the key on the <a href='!antispam-settings'>AntiSpam settings page</a>.",
-          array(
-            '!defensio-com' => url('http://defensio.com/'),
-            '!defensio-key' => url('http://defensio.com/signup/'),
-            '!antispam-settings' => url('admin/config/spamprevention/antispam'),
-          )),
-          'severity' => REQUIREMENT_ERROR,
-        );
-        return $requirements;
-      }
-    }
   }
 }
 

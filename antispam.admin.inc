@@ -23,10 +23,6 @@ function antispam_settings_form_validate($form, &$form_state) {
           form_set_error('antispam_wpapikey', t('You must enter an API key from the service provider to use AntiSpam module'));
         }
         break;
-      case DEFENSIO_SERVICE:
-        $apikey = $form_state['values']['antispam_deapikey'];
-        $apikey_form_element = 'antispam_deapikey';
-        break;
     }
     if (empty($apikey)) {
       form_set_error($apikey_form_element, t('You must enter an API key from the service provider to use AntiSpam module'));
@@ -65,10 +61,9 @@ function antispam_settings_form() {
     '#title' => t('Service Provider'),
     '#options' => array(
       t('Akismet'),
-      t('Defensio'),
     ),
     '#default_value' => $service_provider,
-    '#description' => t('Please select the anti spam service provider. Do not forget to enter an API key of the select service provider below.'),
+    '#description' => t('Akismet is currently the only available anti-spam provider. Do not forget to enter an API key below.'),
   );
   $form['service']['antispam_wpapikey'] = array(
     '#type' => 'textfield', '#title' => t('Akismet API key'),
@@ -83,20 +78,6 @@ function antispam_settings_form() {
       )
     ),
     '#prefix' => '<div id="antispam-wrapper-0" class="antispam-wrapper">',
-    '#suffix' => '</div>',
-  );
-  $form['service']['antispam_deapikey'] = array(
-    '#type' => 'textfield', '#title' => t('Defensio API key'),
-    '#size' => 50, '#maxlength' => 90,
-    '#default_value' => $antispam_deapikey,
-    '#description' => t('Please, enter here your <a href="!defensio-com">Defensio API key</a>. If you don\'t have one already, you can get it by simply signing up for a free account at <a href="!defensio-key">Defensio.com</a>. Then you will get your API key to use <a href="!defensio-com">Defensio</a> antispam service. Please, consult the <a href="!antispam-faq">Defensio FAQ</a> for further information.',
-      array(
-        '!defensio-com' => url('http://defensio.com/'),
-        '!defensio-key' => url('http://defensio.com/signup/'),
-        '!antispam-faq' => url('http://defensio.com/faq'),
-      )
-    ),
-    '#prefix' => '<div id="antispam-wrapper-2" class="antispam-wrapper">',
     '#suffix' => '</div>',
   );
 
@@ -748,29 +729,15 @@ function antispam_moderation_form($form, &$form_state, $mode = '', $submode = ''
     elseif ($submode == 'published') {
       $query->condition('n.status', 1);
     }
-    if (antispam_get_service_provider() == DEFENSIO_SERVICE) {
-      $form['header'] = array('#type' => 'value', '#value' => array(
-        // theme('table_select_header_cell'),
-        array('class' => 'select-all'),
-        array('data' => t('Title'), 'field' => 'title'),
-        array('data' => t('Type'), 'field' => 'type'),
-        array('data' => t('Author'), 'field' => 'name'),
-        array('data' => t('Status'), 'field' => 'status'),
-        array('data' => t('Spaminess'), 'field' => 'spaminess', 'sort' => 'desc'),
-        array('data' => t('Last changed'), 'field' => 'changed', 'sort' => 'desc')
-      ));
-    }
-    else {
-      $form['header'] = array('#type' => 'value', '#value' => array(
-        // theme('table_select_header_cell'),
-        array('class' => 'select-all'),
-        array('data' => t('Title'), 'field' => 'title'),
-        array('data' => t('Type'), 'field' => 'type'),
-        array('data' => t('Author'), 'field' => 'name'),
-        array('data' => t('Status'), 'field' => 'status'),
-        array('data' => t('Last changed'), 'field' => 'changed', 'sort' => 'desc')
-      ));
-    }
+    $form['header'] = array('#type' => 'value', '#value' => array(
+      // theme('table_select_header_cell'),
+      array('class' => 'select-all'),
+      array('data' => t('Title'), 'field' => 'title'),
+      array('data' => t('Type'), 'field' => 'type'),
+      array('data' => t('Author'), 'field' => 'name'),
+      array('data' => t('Status'), 'field' => 'status'),
+      array('data' => t('Last changed'), 'field' => 'changed', 'sort' => 'desc')
+    ));
   }
   // Comments.
   else {
@@ -792,27 +759,14 @@ function antispam_moderation_form($form, &$form_state, $mode = '', $submode = ''
     elseif ($submode == 'published') {
       $query->condition('c.status', COMMENT_PUBLISHED);
     }
-    if (antispam_get_service_provider() == DEFENSIO_SERVICE) {
-      $form['header'] = array('#type' => 'value', '#value' => array(
-        // theme('table_select_header_cell'),
-        array('class' => 'select-all'),
-        array('data' => t('Subject'), 'field' => 'subject'),
-        array('data' => t('Author'), 'field' => 'name'),
-        array('data' => t('Status'), 'field' => 'status'),
-        array('data' => t('Spaminess'), 'field' => 'spaminess', 'sort' => 'desc'),
-        array('data' => t('Last changed'), 'field' => 'created', 'sort' => 'desc')
-      ));
-    }
-    else {
-      $form['header'] = array('#type' => 'value', '#value' => array(
-        // theme('table_select_header_cell'),
-        array('class' => 'select-all'),
-        array('data' => t('Subject'), 'field' => 'subject'),
-        array('data' => t('Author'), 'field' => 'name'),
-        array('data' => t('Status'), 'field' => 'status'),
-        array('data' => t('Last changed'), 'field' => 'created', 'sort' => 'desc')
-      ));
-    }
+    $form['header'] = array('#type' => 'value', '#value' => array(
+      // theme('table_select_header_cell'),
+      array('class' => 'select-all'),
+      array('data' => t('Subject'), 'field' => 'subject'),
+      array('data' => t('Author'), 'field' => 'name'),
+      array('data' => t('Status'), 'field' => 'status'),
+      array('data' => t('Last changed'), 'field' => 'created', 'sort' => 'desc')
+    ));
   }
 
   $records_per_page = variable_get('antispam_records_per_page', 50);
@@ -842,9 +796,6 @@ function antispam_moderation_form($form, &$form_state, $mode = '', $submode = ''
       if ($content->spam_mark) {
         $form['status'][$content->nid]['#value'] .= '/' . t('spam');
       }
-      if (antispam_get_service_provider() == DEFENSIO_SERVICE) {
-        $form['spaminess'][$content->nid] = array('#type' => 'item', '#markup' => _antispam_spaminess_bar($content->spaminess));
-      }
       $form['created'][$content->nid] = array('#value' => t('%time ago', array('%time' => format_interval($now - $content->changed))));
     }
     // Comments.
@@ -862,9 +813,6 @@ function antispam_moderation_form($form, &$form_state, $mode = '', $submode = ''
       $form['status'][$content->cid] = array('#value' => ($content->status == COMMENT_PUBLISHED ? t('published') : t('not published')));
       if ($content->spam_mark) {
         $form['status'][$content->cid]['#value'] .= '/' . t('spam');
-      }
-      if (antispam_get_service_provider() == DEFENSIO_SERVICE) {
-        $form['spaminess'][$content->cid] = array('#type' => 'item', '#markup' => _antispam_spaminess_bar($content->spaminess));
       }
       $form['created'][$content->cid] = array('#value' => t('%time ago', array('%time' => format_interval($now - $content->created))));
     }
@@ -899,9 +847,6 @@ function theme_antispam_moderation_form($variables) {
       }
       $row[] = render($form['author'][$key]['#value']);
       $row[] = render($form['status'][$key]['#value']);
-      if (antispam_get_service_provider() == DEFENSIO_SERVICE) {
-        $row[] = render($form['spaminess'][$key]['#value']);
-      }
       $row[] = render($form['created'][$key]['#value']);
       $rows[] = $row;
     }
@@ -916,12 +861,7 @@ function theme_antispam_moderation_form($variables) {
     else { // published
       $message = ($mode == 'nodes' ? t('There are no published nodes.') : t('There are no published comments.'));
     }
-    if (antispam_get_service_provider() == DEFENSIO_SERVICE) {
-      $rows[] = array(array('data' => $message, 'align' => 'center', 'colspan' => ($mode == 'nodes' ? '7' : '6')));
-    }
-    else {
-      $rows[] = array(array('data' => $message, 'align' => 'center', 'colspan' => ($mode == 'nodes' ? '6' : '5')));
-    }
+    $rows[] = array(array('data' => $message, 'align' => 'center', 'colspan' => ($mode == 'nodes' ? '6' : '5')));
   }
   $output .= theme('table', array('header' => $form['header']['#value'], 'rows' => $rows));
   $output .= render($form['pager']['#value']);
