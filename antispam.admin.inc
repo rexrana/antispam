@@ -20,15 +20,17 @@ function antispam_settings_form_validate($form, &$form_state) {
         $apikey = $form_state['values']['antispam_wpapikey'];
         $apikey_form_element = 'antispam_wpapikey';
         if (empty($apikey)) {
-          form_set_error('antispam_wpapikey', t('You must enter an API key from the service provider to use AntiSpam module'));
+          form_set_error('antispam_wpapikey', t('You must enter an Akismet API key in order to use the AntiSpam module.'));
         }
         break;
     }
-    if (empty($apikey)) {
-      form_set_error($apikey_form_element, t('You must enter an API key from the service provider to use AntiSpam module'));
-    }
-    if (antispam_api_cmd_verify_key($apikey, $service_provider) == ANTISPAM_API_RESULT_ERROR) {
-      form_set_error($apikey_form_element, t('The API key you entered is not valid. Check the email from the service provider and enter a valid API key'));
+    if (!empty($apikey)) {
+      if (antispam_api_cmd_verify_key($apikey, $service_provider) == ANTISPAM_API_RESULT_ERROR) {
+        form_set_error($apikey_form_element, t('The API key you entered is not valid.'));
+      }
+      else {
+        drupal_set_message(t('Your Akismet API key has been verified. Say goodbye to spam!'));
+      }
     }
   }
 }
