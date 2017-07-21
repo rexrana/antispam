@@ -1050,10 +1050,6 @@ function _antispam_comment_save($comment) {
       antispam_content_publish_operation('comment', $comment, 'unpublish', FALSE);
     }
 
-    // Since users won't see their replies published, show them a polite
-    // explanation on why.
-    drupal_set_message(t('Your comment has been queued for moderation by site administrators and will be published after approval.'));
-
     // Record the event to watchdog.
     if ($api_result[0] == ANTISPAM_API_RESULT_ERROR) {
       watchdog('content', 'AntiSpam service seems to be down, comment queued for manual approval: %subject', array('%subject' => $comment->subject), WATCHDOG_WARNING, l(t('view'), 'node/' . $comment->nid, array('fragment' => 'comment-' . $comment->cid)));
