@@ -17,7 +17,6 @@ define('ANTISPAM_MODULE_USERAGENT', 'Drupal/' . ANTISPAM_DRUPAL_VERSION . ' | an
  * AntiSpam API constants.
  */
 define('AKISMET_API_HOST', 'rest.akismet.com');
-define('TYPEPAD_API_HOST', 'api.antispam.typepad.com');
 define('DEFENSIO_API_HOST', 'api.defensio.com');
 define('ANTISPAM_API_PORT', 80);
 define('AKISMET_API_VERSION', '1.1');
@@ -32,7 +31,7 @@ define('ANTISPAM_API_RESULT_IS_HAM', 2);
  * Service provider constants.
  */
 define('AKISMET_SERVICE', 0);
-define('TYPEPAD_SERVICE', 1);
+define('TYPEPAD_SERVICE', 1); // @obsolete
 define('DEFENSIO_SERVICE', 2);
 
 define('ANTISPAM_COUNT_ALL', 0);
@@ -62,7 +61,6 @@ function antispam_help($path, $arg) {
       $output = t('<p>In order to use the AntiSpam, you need a API key for the selected antispam service. If you don\'t have one already, you can get it by simply signing up for a free account at the following sites.</p>
 <ul>
   <li><a href="!akismet">akismet.com</a> for Akismet service
-  <li><a href="!typepad">typepad.com</a> for TypePad AntiSpam service
   <li><a href="!defensio">defensio.com</a> for Defensio service
 </ul>
 <p>The <em>antispam module</em> may automatically check for spam posted in content (nodes and/or comments) by any user, except node or comment administrators respectively. It is also possible, from the <a href="!permission">Permission</a> panel, to grant <em>%no-check-perm</em> permission to <em>user roles</em> of your choice.</p>
@@ -70,7 +68,6 @@ function antispam_help($path, $arg) {
 <p>Automatic spam detection can be enabled or disabled by content type and/or comments. In addition to this, the antspam service makes it easy for <em>content administrators</em> to manually <em>publish</em>/<em>unpublish</em> content and <em>mark</em>/<em>unmark</em> content as spam, from links available at the bottom of content.</p>',
       array(
         '!akismet' => url('http://akismet.com'),
-        '!typepad' => url('http://antispam.typepad.com'),
         '!defensio' => url('http://defensio.com'),
         '!antispam-settings' => url('admin/config/spamprevention/antispam'),
         '!permission' => url('admin/people/permissions'),
@@ -79,12 +76,11 @@ function antispam_help($path, $arg) {
       return $output;
     case 'admin/help/antispam':
     case 'admin/config/spamprevention/antispam':
-      $output = t('<p>The <a href="!antispam-module-home">AntiSpam module</a> for <a href="!drupal">Drupal</a> allows you to use either one of the <a href="!akismet">Akismet</a>, <a href="!typepad">TypePad AntiSpam</a> or <a href="!defensio">Defensio</a> service to protect your site from being spammed.</p>',
+      $output = t('<p>The <a href="!antispam-module-home">AntiSpam module</a> for <a href="!drupal">Drupal</a> allows you to use either one of the <a href="!akismet">Akismet</a> or <a href="!defensio">Defensio</a> service to protect your site from being spammed.</p>',
       array(
         '!antispam-module-home' => url(ANTISPAM_MODULE_HOMEURL),
         '!drupal' => url('http://drupal.org'),
         '!akismet' => url('http://akismet.com'),
-        '!typepad' => url('http://antispam.typepad.com'),
         '!defensio' => url('http://defensio.com'),
       ));
       $output .= t('<p>AntiSpam has caught <strong>@count spam</strong> for you since %since.</p>', array('@count' => antispam_get_total_counter(ANTISPAM_COUNT_SPAM_DETECTED), '%since' => antispam_get_counting_since()));
@@ -173,8 +169,6 @@ function antispam_get_provider_name($provider, $with_link = FALSE) {
   switch ($provider) {
     case AKISMET_SERVICE:
       return $with_link ? t('<a href="http://akismet.com">Akismet</a>') : t('Akismet');
-    case TYPEPAD_SERVICE:
-      return $with_link ? t('<a href="http://antispam.typepad.com">TypePad AntiSpam</a>') : t('TypePad AntiSpam');
     case DEFENSIO_SERVICE:
       return $with_link ? t('<a href="http://defensio.com">Defensio</a>') : t('Defensio');
     default:
@@ -190,9 +184,6 @@ function antispam_get_api_host($provider) {
     case AKISMET_SERVICE:
       $api_host = AKISMET_API_HOST;
       break;
-    case TYPEPAD_SERVICE:
-      $api_host = TYPEPAD_API_HOST;
-      break;
     case DEFENSIO_SERVICE:
       $api_host = DEFENSIO_API_HOST;
       break;
@@ -207,9 +198,6 @@ function antispam_get_api_key($provider) {
   switch ($provider) {
     case AKISMET_SERVICE:
       $api_key = variable_get('antispam_wpapikey', '');
-      break;
-    case TYPEPAD_SERVICE:
-      $api_key = variable_get('antispam_tpapikey', '');
       break;
     case DEFENSIO_SERVICE:
       $api_key = variable_get('antispam_deapikey', '');
@@ -2078,7 +2066,7 @@ function antispam_content_publish_operation($content_type, $content, $op, $log_a
  * @param object $content
  *   Content object.
  * @param integer $provider
- *   AKISMET_SERVIE/TYPEPAD_SERVICE/DEFENSIO_SERVICE
+ *   AKISMET_SERVIE/DEFENSIO_SERVICE
  *
  * @return array
  */
@@ -2145,7 +2133,7 @@ function antispam_prepare_comment_data($content_type, $content, $provider) {
       }
     }
   }
-  // Akismet or Typepad.
+  // Akismet
   else {
     $comment_data = array(
       // IP address of the comment submitter.
@@ -2237,7 +2225,7 @@ function antispam_api_cmd_verify_key($key, $provider) {
     return (_antispam_parse_yaml_response($response[1], 'status') == 'success' ? ANTISPAM_API_RESULT_SUCCESS : ANTISPAM_API_RESULT_ERROR);
   }
   else {
-    // AKISMET, TYPEPAD
+    // AKISMET
     $request = 'key=' . $key . '&blog=' . $base_url . base_path();
     $response = _antispam_api_http_post($request, $api_host, '/' . AKISMET_API_VERSION . '/verify-key');
     if (!isset($response[1])) {
@@ -2332,7 +2320,7 @@ function antispam_api_cmd_comment_check($content_type, $content) {
     }
   }
 
-  // Akismet or Typepad.
+  // Akismet.
   else {
     $comment_data = array_merge(_antispam_api_prepare_request_data(), $comment_data);
     $query_string = _antispam_api_build_query_string($comment_data);
@@ -2387,7 +2375,7 @@ function antispam_api_cmd_submit_spam($content_type, $content) {
     return (_antispam_parse_yaml_response($response[1], 'status') == 'success' ? ANTISPAM_API_RESULT_SUCCESS : ANTISPAM_API_RESULT_ERROR);
   }
 
-  // Akismet or Typepad.
+  // Akismet
   else {
     $query_string = _antispam_api_build_query_string($comment_data);
     $host = $api_key . '.' . $api_host;
@@ -2437,7 +2425,7 @@ function antispam_api_cmd_submit_ham($content_type, $content) {
     return (_antispam_parse_yaml_response($response[1], 'status') == 'success' ? ANTISPAM_API_RESULT_SUCCESS : ANTISPAM_API_RESULT_ERROR);
   }
 
-  // Akismet or Typepad.
+  // Akismet
   else {
     $query_string = _antispam_api_build_query_string($comment_data);
     $host = $api_key . '.' . $api_host;
@@ -2512,7 +2500,7 @@ function _antispam_api_build_query_string($array) {
     $string = 'owner-url=' . $base_url . base_path();
   }
 
-  // Akismet or Typepad.
+  // Akismet
   else {
     $string = 'blog=' . $base_url . base_path();
   }

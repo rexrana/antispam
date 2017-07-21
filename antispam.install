@@ -29,22 +29,6 @@ function antispam_requirements($phase) {
         return $requirements;
       }
     }
-    elseif ($provider == TYPEPAD_SERVICE) {
-      if (variable_get('antispam_tpapikey', '') == '') {
-        $requirements['antispam_key'] = array(
-          'title' => t('TypePad AntiSpam API key'),
-          'value' => t('Not present'),
-          'description' => t("TypePad AntiSpam service requires a <a href='!tpapikey'>TypePad.com AntiSpam API key</a> to function. Obtain a key by signing up for a free account at <a href='!typepad-com'>Typepad.com</a>. Once you get a free account, visit the <a href='!tpapikey'>TypePad AntiSpam Service</a> and get your free TypePad AntiSpam API Key there, then enter the key on the <a href='!antispam-settings'>AntiSpam settings page</a>.",
-          array(
-            '!tpapikey' => url('http://antispam.typepad.com/info/get-api-key.html'),
-            '!typepad-com' => url('http://typepad.com/connect/register'),
-            '!antispam-settings' => url('admin/config/spamprevention/antispam'),
-          )),
-          'severity' => REQUIREMENT_ERROR,
-        );
-        return $requirements;
-      }
-    }
     elseif ($provider == DEFENSIO_SERVICE) {
       if (variable_get('antispam_deapikey', '') == '') {
         $requirements['antispam_key'] = array(

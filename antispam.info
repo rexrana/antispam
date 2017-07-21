@@ -1,5 +1,5 @@
 name = AntiSpam
-description = Use the Akismet, Defensio or TypePad AntiSpam services to protect your site from spam.
+description = Use the Akismet or Defensio services to protect your site from spam.
 configure = admin/config/spamprevention/antispam
 core = 7.x
 files[] = tests/antispam.test

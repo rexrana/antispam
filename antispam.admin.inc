@@ -23,13 +23,6 @@ function antispam_settings_form_validate($form, &$form_state) {
           form_set_error('antispam_wpapikey', t('You must enter an API key from the service provider to use AntiSpam module'));
         }
         break;
-      case TYPEPAD_SERVICE:
-        $apikey = $form_state['values']['antispam_tpapikey'];
-        $apikey_form_element = 'antispam_tpapikey';
-        if (empty($apikey)) {
-          form_set_error('antispam_tpapikey', t('You must enter an API key from the service provider to use AntiSpam module'));
-        }
-        break;
       case DEFENSIO_SERVICE:
         $apikey = $form_state['values']['antispam_deapikey'];
         $apikey_form_element = 'antispam_deapikey';
@@ -72,11 +65,10 @@ function antispam_settings_form() {
     '#title' => t('Service Provider'),
     '#options' => array(
       t('Akismet'),
-      t('TypePad AntiSpam'),
       t('Defensio'),
     ),
     '#default_value' => $service_provider,
-    '#description' => t('Please select the anti spam service provider. Although they provide the similar services, TypePad AntiSpam service is free even for commercial sites while Akismet and Defensio have some limitations on the commercial usage. Do not forget to enter an API key of the select service provider below.'),
+    '#description' => t('Please select the anti spam service provider. Do not forget to enter an API key of the select service provider below.'),
   );
   $form['service']['antispam_wpapikey'] = array(
     '#type' => 'textfield', '#title' => t('Akismet API key'),
@@ -91,20 +83,6 @@ function antispam_settings_form() {
       )
     ),
     '#prefix' => '<div id="antispam-wrapper-0" class="antispam-wrapper">',
-    '#suffix' => '</div>',
-  );
-  $form['service']['antispam_tpapikey'] = array(
-    '#type' => 'textfield', '#title' => t('TypePad AntiSpam API key'),
-    '#size' => 50, '#maxlength' => 90,
-    '#default_value' => $antispam_tpapikey,
-    '#description' => t('Please, enter here your <a href="!tpapikey">TypePad.com AntiSpam API key</a>. If you don\'t have one already, you can get it by simply signing up for a free account at <a href="!typepad-com">Typepad.com</a>. Once you get a free acount, visit the <a href="!tpapikey">TypePad AntiSpam Service</a> and get your free TypePad AntiSpam API Key there. Please, consult the <a href="!antispam-faq">TypePad AntiSpam FAQ</a> for further information.',
-      array(
-        '!tpapikey' => url('http://antispam.typepad.com/info/get-api-key.html'),
-        '!typepad-com' => url('http://typepad.com/connect/register'),
-        '!antispam-faq' => url('http://antispam.typepad.com/info/faq.html'),
-      )
-    ),
-    '#prefix' => '<div id="antispam-wrapper-1" class="antispam-wrapper">',
     '#suffix' => '</div>',
   );
   $form['service']['antispam_deapikey'] = array(
