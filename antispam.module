@@ -793,8 +793,6 @@ function _antispam_node_save(&$node) {
       $node->signature = $api_result[1];
       $node->spaminess = $api_result[2];
 
-      // Oops! We got spammed, let's mark the comment as such.
-      antispam_content_spam_operation('node', $node, 'submit-spam', FALSE);
       antispam_increase_counter(ANTISPAM_COUNT_SPAM_DETECTED);
 
       antispam_notify_moderators('node', $node, FALSE, TRUE);
@@ -1038,8 +1036,6 @@ function _antispam_comment_save($comment) {
       $comment->signature = $api_result[1];
       $comment->spaminess = $api_result[2];
 
-      // Oops! We got spammed, let's mark the comment as such.
-      antispam_content_spam_operation('comment', $comment, 'submit-spam', FALSE);
       antispam_increase_counter(ANTISPAM_COUNT_SPAM_DETECTED);
 
       antispam_notify_moderators('comment', $comment, FALSE, TRUE);
