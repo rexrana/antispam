@@ -2158,7 +2158,7 @@ function antispam_api_cmd_comment_check($content_type, $content) {
 
   $comment_data = array_merge(_antispam_api_prepare_request_data(), $comment_data);
   $query_string = _antispam_api_build_query_string($comment_data);
-  $host = $api_key . '.' . $api_host;
+  $host = $api_key . ' . ' . $api_host;
   $response = _antispam_api_http_post($query_string, $host, '/' . AKISMET_API_VERSION . '/comment-check');
 
   if (!isset($response[1])) {
@@ -2198,7 +2198,7 @@ function antispam_api_cmd_submit_spam($content_type, $content) {
   }
 
   $query_string = _antispam_api_build_query_string($comment_data);
-  $host = $api_key . '.' . $api_host;
+  $host = $api_key . ' . ' . $api_host;
   $response = _antispam_api_http_post($query_string, $host, '/' . AKISMET_API_VERSION . '/submit-spam');
   if (!isset($response[1])) {
     watchdog('antispam', "submitting spam: can not get a response back from the service provider " . antispam_get_provider_name($provider, FALSE));
@@ -2234,7 +2234,7 @@ function antispam_api_cmd_submit_ham($content_type, $content) {
   }
 
   $query_string = _antispam_api_build_query_string($comment_data);
-  $host = $api_key . '.' . $api_host;
+  $host = $api_key . ' . ' . $api_host;
   $response = _antispam_api_http_post($query_string, $host, '/' . AKISMET_API_VERSION . '/submit-ham');
   if (!isset($response[1])) {
     watchdog('antispam', "submitting ham: can not get a response back from the service provider " . antispam_get_provider_name($provider, FALSE));
