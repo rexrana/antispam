@@ -839,27 +839,27 @@ function antispam_node_validate($node, $form, &$form_state) {
   $antispambot_rules = antispam_get_anti_spambot_rules();
 
   $query = db_select('antispam_spam_marks', 's');
-  if ($antispambot_rules['body']) {
+  if (!empty($antispambot_rules['body'])) {
     $query->join('field_data_body', 'e', 'e.entity_id = s.content_id');
   }
   $query->fields('s', array('content_id'));
-  if ($antispambot_rules['body']) {
+  if (!empty($antispambot_rules['body'])) {
     $query->addField('e', 'body_value', 'body');
   }
   $query->condition('s.content_type', 'node');
   $query->range(0, 1);
 
-  if ($antispambot_rules['ip']) {
+  if (!empty($antispambot_rules['ip'])) {
     $query->condition('s.hostname', ip_address());
     $debug_info['IP-address'] = ip_address();
     $num_condition++;
   }
-  if ($antispambot_rules['mail'] && !empty($user->mail)) {
+  if (!empty($antispambot_rules['mail']) && !empty($user->mail)) {
     $query->condition('s.mail', $user->mail);
     $debug_info['E-mail'] = $user->mail;
     $num_condition++;
   }
-  if ($antispambot_rules['body'] && !empty($node->body)) {
+  if (!empty($antispambot_rules['body']) && !empty($node->body)) {
     $query->condition('e.body_value', $node->body[$node->language][0]['value']);
     $debug_info['Content'] = $node->body[$node->language][0]['value'];
     $num_condition++;
@@ -959,17 +959,17 @@ function antispam_comment_presave($comment) {
 
   $rules_conditions = db_or();
 
-  if ($antispambot_rules['ip']) {
+  if (!empty($antispambot_rules['ip'])) {
     $rules_conditions->condition('s.hostname', ip_address());
     $debug_info['IP-address'] = ip_address();
     $num_condition++;
   }
-  if ($antispambot_rules['mail'] && !empty($comment->mail)) {
+  if (!empty($antispambot_rules['mail']) && !empty($comment->mail)) {
     $rules_conditions->condition('s.mail', $comment->mail);
     $debug_info['E-mail'] = $comment->mail;
     $num_condition++;
   }
-  if ($antispambot_rules['body'] && !empty($comment->comment_body)) {
+  if (!empty($antispambot_rules['body']) && !empty($comment->comment_body)) {
     if ($num_condition) {
       $join_type = 'LEFT OUTER';
     }
