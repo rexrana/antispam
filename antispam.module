@@ -2051,7 +2051,7 @@ function antispam_prepare_comment_data($content_type, $content, $provider) {
     $comment_data['permalink'] = url('node/' . $content->nid, array('fragment' => 'comment-' . $content->cid));
     $comment_data['comment_author_email'] = $content->mail;
     $comment_data['comment_author_url'] = $content->homepage;
-    $comment_data['comment_content'] = render($content->comment_body[$content->language][0]['value']);
+    $comment_data['comment_content'] = trim( $content->subject . "\n\n" . render($content->comment_body[$content->language][0]['value']) );
   }
   elseif ($content_type == 'node') {
     $comment_data['permalink'] = url('node/' . $content->nid);
