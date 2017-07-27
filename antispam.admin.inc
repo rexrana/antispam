@@ -174,10 +174,10 @@ function antispam_settings_form() {
       ))
   );
   $form['node_options']['antispam_node_spam_links'] = array(
-    '#type' => 'radios', '#title' => t('Show submit spam/ham links'),
+    '#type' => 'radios', '#title' => t('Show spam/not spam links'),
     '#options' => $enable_options,
     '#default_value' => variable_get('antispam_node_spam_links', 0),
-    '#description' => t('Use this option to <em>enable</em> or <em>disable</em> links for <em>submit spam</em>/<em>ham</em> operations in nodes. If enabled, these links will only be displayed to <a href="!admin-access">spam moderators</a> and users with <a href="!admin-access">@admin-nodes</a> permission.',
+    '#description' => t('Use this option to <em>enable</em> or <em>disable</em> links for marking nodes as spam or not spam. If enabled, these links will only be displayed to <a href="!admin-access">spam moderators</a> and users with <a href="!admin-access">@admin-nodes</a> permission.',
       array(
         '@admin-nodes' => t('administer nodes'),
         '!admin-access' => url('admin/access'),
@@ -212,10 +212,10 @@ function antispam_settings_form() {
         ))
     );
     $form['comment_options']['antispam_comment_spam_links'] = array(
-      '#type' => 'radios', '#title' => t('Show submit spam/ham links'),
+      '#type' => 'radios', '#title' => t('Show spam/not spam links'),
       '#options' => $enable_options,
       '#default_value' => variable_get('antispam_comment_spam_links', 1),
-      '#description' => t('Use this option to <em>enable</em> or <em>disable</em> links for <em>submit spam</em>/<em>ham</em> operations in comments. If enabled, these links will only be displayed to <a href="!admin-access">spam moderators</a> and users with <a href="!admin-access">@admin-comments</a> permission.',
+      '#description' => t('Use this option to <em>enable</em> or <em>disable</em> links for marking comments as spam or not spam. If enabled, these links will only be displayed to <a href="!admin-access">spam moderators</a> and users with <a href="!admin-access">@admin-comments</a> permission.',
         array(
           '@admin-comments' => t('administer comments'),
           '!admin-access' => url('admin/access'),

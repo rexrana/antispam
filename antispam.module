@@ -904,10 +904,10 @@ function antispam_node_view($node, $view_mode, $langcode) {
     // Adding submit ham/submit spam links.
     if (variable_get('antispam_node_spam_links', 0)) {
       if (antispam_content_is_spam('node', $node->nid)) {
-        $links['antispam_node_ham'] = array('title' => (variable_get('antispam_connection_enabled', 1) ? t('Submit ham') : t('Mark as ham')), 'href' => 'antispam/node/' . $node->nid . '/submit-ham');
+        $links['antispam_node_ham'] = array('title' => t('Not Spam'), 'href' => 'antispam/node/' . $node->nid . '/submit-ham');
       }
       else {
-        $links['antispam_node_spam'] = array('title' => (variable_get('antispam_connection_enabled', 1) ? t('Submit spam') : t('Mark as spam')), 'href' => 'antispam/node/' . $node->nid . '/submit-spam');
+        $links['antispam_node_spam'] = array('title' => t('Spam'), 'href' => 'antispam/node/' . $node->nid . '/submit-spam');
       }
     }
     $node->content['links']['node']['#links'] = 
@@ -1094,10 +1094,10 @@ function antispam_comment_view($comment, $view_mode, $langcode) {
     }
     if (variable_get('antispam_comment_spam_links', 1)) {
       if (antispam_content_is_spam('comment', $comment->cid)) {
-        $links['antispam_comment_ham'] = array('title' => (variable_get('antispam_connection_enabled', 1) ? t('Submit ham') : t('Mark as ham')), 'href' => 'antispam/comment/' . $comment->cid . '/submit-ham');
+        $links['antispam_comment_ham'] = array('title' => t('Not Spam'), 'href' => 'antispam/comment/' . $comment->cid . '/submit-ham');
       }
       else {
-        $links['antispam_comment_spam'] = array('title' => (variable_get('antispam_connection_enabled', 1) ? t('Submit spam') : t('Mark as spam')), 'href' => 'antispam/comment/' . $comment->cid . '/submit-spam');
+        $links['antispam_comment_spam'] = array('title' => t('Spam'), 'href' => 'antispam/comment/' . $comment->cid . '/submit-spam');
       }
     }
     $comment->content['links']['comment']['#links'] 
