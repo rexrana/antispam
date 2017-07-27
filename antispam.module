@@ -16,9 +16,9 @@ define('ANTISPAM_MODULE_USERAGENT', 'Drupal/' . ANTISPAM_DRUPAL_VERSION . ' | an
 /**
  * AntiSpam API constants.
  */
-define('AKISMET_API_HOST', 'rest.akismet.com');
-define('ANTISPAM_API_PORT', 80);
-define('AKISMET_API_VERSION', '1.1');
+define('ANTISPAM_AKISMET_API_HOST', 'rest.akismet.com');
+define('ANTISPAM_AKISMET_API_PORT', 80);
+define('ANTISPAM_AKISMET_API_VERSION', '1.1');
 define('ANTISPAM_API_USERAGENT', 'Drupal/' . ANTISPAM_DRUPAL_VERSION . ' | antispam.module/' . ANTISPAM_MODULE_VERSION);
 define('ANTISPAM_API_RESULT_ERROR', -1);
 define('ANTISPAM_API_RESULT_SUCCESS', 0);
@@ -28,9 +28,9 @@ define('ANTISPAM_API_RESULT_IS_HAM', 2);
 /**
  * Service provider constants.
  */
-define('AKISMET_SERVICE', 0);
-define('TYPEPAD_SERVICE', 1); // @obsolete
-define('DEFENSIO_SERVICE', 2); // @obsolete
+define('ANTISPAM_AKISMET_SERVICE', 0);
+// define('ANTISPAM_TYPEPAD_SERVICE', 1); // @obsolete
+// define('ANTISPAM_DEFENSIO_SERVICE', 2); // @obsolete
 
 define('ANTISPAM_COUNT_ALL', 0);
 define('ANTISPAM_COUNT_SPAM_DETECTED', 1);
@@ -162,7 +162,7 @@ function antispam_get_service_provider() {
  */
 function antispam_get_provider_name($provider, $with_link = FALSE) {
   switch ($provider) {
-    case AKISMET_SERVICE:
+    case ANTISPAM_AKISMET_SERVICE:
       return $with_link ? t('<a href="http://akismet.com">Akismet</a>') : t('Akismet');
     default:
       return '';
@@ -174,8 +174,8 @@ function antispam_get_provider_name($provider, $with_link = FALSE) {
  */
 function antispam_get_api_host($provider) {
   switch ($provider) {
-    case AKISMET_SERVICE:
-      $api_host = AKISMET_API_HOST;
+    case ANTISPAM_AKISMET_SERVICE:
+      $api_host = ANTISPAM_AKISMET_API_HOST;
       break;
   }
   return $api_host;
@@ -186,7 +186,7 @@ function antispam_get_api_host($provider) {
  */
 function antispam_get_api_key($provider) {
   switch ($provider) {
-    case AKISMET_SERVICE:
+    case ANTISPAM_AKISMET_SERVICE:
       $api_key = variable_get('antispam_wpapikey', '');
       break;
   }
@@ -2026,7 +2026,7 @@ function antispam_content_publish_operation($content_type, $content, $op, $log_a
  * @param object $content
  *   Content object.
  * @param integer $provider
- *   AKISMET_SERVICE
+ *   ANTISPAM_AKISMET_SERVICE
  *
  * @return array
  */
@@ -2089,7 +2089,7 @@ function antispam_api_cmd_verify_key($key, $provider) {
   }
   $api_host = antispam_get_api_host($provider);
   $request = 'key=' . $key . '&blog=' . $base_url . base_path();
-  $response = _antispam_api_http_post($request, $api_host, '/' . AKISMET_API_VERSION . '/verify-key');
+  $response = _antispam_api_http_post($request, $api_host, '/' . ANTISPAM_AKISMET_API_VERSION . '/verify-key');
   if (!isset($response[1])) {
     watchdog('antispam', "verifying a key: can not get a response back from the service provider " . antispam_get_provider_name($provider, FALSE));
     return ANTISPAM_API_RESULT_ERROR;
@@ -2160,7 +2160,7 @@ function antispam_api_cmd_comment_check($content_type, $content) {
   $comment_data = array_merge(_antispam_api_prepare_request_data(), $comment_data);
   $query_string = _antispam_api_build_query_string($comment_data);
   $host = $api_key . '.' . $api_host;
-  $response = _antispam_api_http_post($query_string, $host, '/' . AKISMET_API_VERSION . '/comment-check');
+  $response = _antispam_api_http_post($query_string, $host, '/' . ANTISPAM_AKISMET_API_VERSION . '/comment-check');
 
   if (!isset($response[1])) {
     watchdog('antispam', "cheking a content failed: can not get a response back from the service provider " . antispam_get_provider_name($provider, FALSE));
@@ -2200,7 +2200,7 @@ function antispam_api_cmd_submit_spam($content_type, $content) {
 
   $query_string = _antispam_api_build_query_string($comment_data);
   $host = $api_key . '.' . $api_host;
-  $response = _antispam_api_http_post($query_string, $host, '/' . AKISMET_API_VERSION . '/submit-spam');
+  $response = _antispam_api_http_post($query_string, $host, '/' . ANTISPAM_AKISMET_API_VERSION . '/submit-spam');
   if (!isset($response[1])) {
     watchdog('antispam', "submitting spam: can not get a response back from the service provider " . antispam_get_provider_name($provider, FALSE));
     return ANTISPAM_API_RESULT_ERROR;
@@ -2236,7 +2236,7 @@ function antispam_api_cmd_submit_ham($content_type, $content) {
 
   $query_string = _antispam_api_build_query_string($comment_data);
   $host = $api_key . '.' . $api_host;
-  $response = _antispam_api_http_post($query_string, $host, '/' . AKISMET_API_VERSION . '/submit-ham');
+  $response = _antispam_api_http_post($query_string, $host, '/' . ANTISPAM_AKISMET_API_VERSION . '/submit-ham');
   if (!isset($response[1])) {
     watchdog('antispam', "submitting ham: can not get a response back from the service provider " . antispam_get_provider_name($provider, FALSE));
     return ANTISPAM_API_RESULT_ERROR;
@@ -2336,7 +2336,7 @@ function _antispam_api_http_post($request, $host, $path) {
     . $request;
 
   $response = '';
-  if (false !== ($fs = @fsockopen($host, ANTISPAM_API_PORT, $errno, $errstr, $fsock_timeout))) {
+  if (false !== ($fs = @fsockopen($host, ANTISPAM_AKISMET_API_PORT, $errno, $errstr, $fsock_timeout))) {
     fwrite($fs, $http_request);
     while (!feof($fs)) {
       // One TCP-IP packet.

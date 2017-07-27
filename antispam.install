@@ -13,7 +13,7 @@ function antispam_requirements($phase) {
   if ($phase == 'runtime') {
     $provider = antispam_get_service_provider();
 
-    if ($provider == AKISMET_SERVICE) {
+    if ($provider == ANTISPAM_AKISMET_SERVICE) {
       if (variable_get('antispam_wpapikey', '') == '') {
         $requirements['antispam_key'] = array(
           'title' => t('Akismet API key'),

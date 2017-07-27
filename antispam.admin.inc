@@ -9,14 +9,14 @@
 /**
  * Truncate size of content body for the tooltip
  */
-define('BODY_TOOLTIP_LEN', 128);
+define('ANTISPAM_BODY_TOOLTIP_LEN', 128);
 
 function antispam_settings_form_validate($form, &$form_state) {
   // If connection enabled, then validate the entered API key.
   if ($form_state['values']['antispam_connection_enabled']) {
     $service_provider = $form_state['values']['antispam_service_provider'];
     switch ($service_provider) {
-      case AKISMET_SERVICE:
+      case ANTISPAM_AKISMET_SERVICE:
         $apikey = $form_state['values']['antispam_wpapikey'];
         $apikey_form_element = 'antispam_wpapikey';
         if (empty($apikey)) {
@@ -785,7 +785,7 @@ function antispam_moderation_form($form, &$form_state, $mode = '', $submode = ''
       $form['title'][$content->nid] = array(
         '#value' => l($content->title, 'node/' . $content->nid, array(
           'attributes' => array(
-            'title' => truncate_utf8(render($content->body), BODY_TOOLTIP_LEN),
+            'title' => truncate_utf8(render($content->body), ANTISPAM_BODY_TOOLTIP_LEN),
           )
         )
       ) . ' ' . theme('mark', array('type' => node_mark($content->nid, $content->changed))));
@@ -807,7 +807,7 @@ function antispam_moderation_form($form, &$form_state, $mode = '', $submode = ''
       $form['title'][$content->cid] = array(
         '#value' => l($content->subject, 'node/' . $content->nid, array(
           'attributes' => array(
-            'title' => truncate_utf8(render($content->body), BODY_TOOLTIP_LEN)
+            'title' => truncate_utf8(render($content->body), ANTISPAM_BODY_TOOLTIP_LEN)
           ), 
           'fragment' => 'comment-' . $content->cid,
          )) . ' ' . theme('mark', array('type' => node_mark($content->cid, $content->created))));
