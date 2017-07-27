@@ -1357,9 +1357,10 @@ function antispam_notify_moderators($content_type, $content, $is_published, $is_
     . '   INNER JOIN {users_roles} r ON r.rid = p.rid'
     . '   INNER JOIN {users} u ON u.uid = r.uid OR u.uid = 1'
     . '   LEFT JOIN {antispam_moderator} m ON m.uid = u.uid'
-    . ' WHERE p.permission LIKE \'%:perm1%\''
-    . ' OR p.permission LIKE \'%:perm2%\'';
-  $result = db_query($sql, array(':perm1' => $moderator_permission, ':perm2' => $administer_permission));
+    . ' WHERE p.permission LIKE :perm1'
+    . ' OR p.permission LIKE :perm2';
+  $result = db_query($sql, array(':perm1' => '%' . $moderator_permission . '%', ':perm2' => '%' . $administer_permission . '%'));
+
   $moderators = array();
   foreach ($result as $u) {
     // If a moderator submit a new node/comment, then exclude them from the
