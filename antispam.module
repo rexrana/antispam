@@ -2167,6 +2167,32 @@ function antispam_api_cmd_comment_check($content_type, $content) {
     return array(ANTISPAM_API_RESULT_ERROR);
   }
   $result[0] = ('true' == $response[1] ? ANTISPAM_API_RESULT_IS_SPAM : ANTISPAM_API_RESULT_IS_HAM);
+
+  if (ANTISPAM_API_RESULT_IS_SPAM === $result[0]) {
+    if ($content_type == 'node') {
+      global $user;
+      $content_id = $content->nid;
+      $user_mail = (isset($user->mail) ? $user->mail : '');
+    }
+    else {
+      // Comment.
+      $content_id = $content->cid;
+      $user_mail = $content->mail;
+    }
+
+    $hostname = (!empty($content->hostname) ? $content->hostname : ip_address());
+
+    db_insert('antispam_spam_marks')
+      ->fields(array(
+        'content_type' => $content_type,
+        'content_id' => $content_id,
+        'spam_created' => mktime(0, 0, 0, date("m"), date("d"), date("Y")),
+        'hostname' => $hostname,
+        'mail' => $user_mail,
+      ))
+      ->execute();
+  }
+
   // Signature.
   $result[1] = '';
   // Spaminess.
