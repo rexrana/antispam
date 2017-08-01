@@ -2051,7 +2051,16 @@ function antispam_prepare_comment_data($content_type, $content, $provider) {
     $comment_data['permalink'] = url('node/' . $content->nid, array('fragment' => 'comment-' . $content->cid));
     $comment_data['comment_author_email'] = $content->mail;
     $comment_data['comment_author_url'] = $content->homepage;
-    $comment_data['comment_content'] = trim( $content->subject . "\n\n" . render($content->comment_body[$content->language][0]['value']) );
+
+    $comment_data['comment_content'] = render($content->comment_body[$content->language][0]['value']);
+
+    // If the subject isn't the same as the comment body (which happens when no subject is entered),
+    // add it to the beginning.
+    if ($content->subject && $content->subject != $comment_data['comment_content']) {
+        $comment_data['comment_content'] = $content->subject . "\n\n" . $comment_data['comment_content'];
+    }
+
+    $comment_data['comment_content'] = trim($comment_data['comment_content']);
   }
   elseif ($content_type == 'node') {
     $comment_data['permalink'] = url('node/' . $content->nid);
