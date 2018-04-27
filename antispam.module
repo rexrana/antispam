@@ -1542,8 +1542,7 @@ function antispam_user_load($users) {
   $moderator_email_for_options = _antispam_get_email_for_options();
   foreach ($users as $user) {
     $moderator_types = antispam_get_moderator_types($user);
-    $moderator_types_count = count($moderator_types);
-    if ($moderator_types_count > 0) {
+    if ( is_array($moderator_types) && count($moderator_types) > 0) {
       $moderator_data = db_query('SELECT * FROM {antispam_moderator} WHERE uid=:uid', array(':uid' => $user->uid))->fetchObject();
       $user->antispam_moderator_email_for = (isset($moderator_data->email_for) && isset($moderator_email_for_options[$moderator_data->email_for]) ? $moderator_data->email_for : 'approval');
     }
